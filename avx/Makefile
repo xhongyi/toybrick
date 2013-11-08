@@ -1,3 +1,7 @@
+EXECUTABLE = popcount bit_convert string_cp ssse3_popcount
+
+all: $(EXECUTABLE)
+
 popcount.o: popcount.c popcount.h
 	gcc -O2 -march=native -c popcount.c -o popcount.o
 	
@@ -12,3 +16,11 @@ bit_convert: bit_convert.o bit_convertMain.c
 
 string_cp: string_cp.c
 	g++ -O2 -DALIGN_DATA -march=native string_cp.c -o string_cp
+	
+ssse3_popcount:
+	g++ -O2 -DALIGN_DATA -march=native ssse3_popcount.c -o ssse3_popcount
+	
+.PHONY : clean
+
+clean:
+	rm *.o $(EXECUTABLE)
