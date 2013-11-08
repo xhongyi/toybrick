@@ -1,0 +1,55 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+LOC_MASK	string_cp.c	/^uint8_t LOC_MASK[64] = {$/;"	v
+MAX	ssse3_popcount.c	342;"	d	file:
+MAX	ssse3_popcount.c	351;"	d	file:
+MAX	ssse3_popcount.c	468;"	d	file:
+MAX	ssse3_popcount.c	477;"	d	file:
+MAX	ssse3_popcount.c	548;"	d	file:
+MAX	ssse3_popcount.c	557;"	d	file:
+MAX_CHUNKS	ssse3_popcount.c	43;"	d	file:
+OPT_COUNT	ssse3_popcount.c	633;"	d	file:
+OPT_COUNT	string_cp.c	273;"	d	file:
+VERIFY	ssse3_popcount.c	660;"	d	file:
+_MASK_UNIT_	string_cp.c	48;"	d	file:
+_MAX_LENGTH_	string_cp.c	46;"	d	file:
+__aligned__	ssse3_popcount.c	/^uint32_t POPCOUNT_8bit[256] __aligned__ = {$/;"	v
+__aligned__	ssse3_popcount.c	/^uint8_t POPCOUNT_4bit[16] __aligned__ = {$/;"	v
+__aligned__	ssse3_popcount.c	/^uint8_t buffer[16*MAX_CHUNKS] __aligned__;$/;"	v
+__aligned__	ssse3_popcount.c	38;"	d	file:
+__aligned__	ssse3_popcount.c	40;"	d	file:
+__aligned__	string_cp.c	/^char A_filled_t[_MAX_LENGTH_] __aligned__ = {'A'};$/;"	v
+__aligned__	string_cp.c	/^char read_t[_MAX_LENGTH_] __aligned__;$/;"	v
+__aligned__	string_cp.c	/^char ref_t[_MAX_LENGTH_] __aligned__;$/;"	v
+__aligned__	string_cp.c	/^uint64_t read_int64_t[_MAX_LENGTH_ \/ 32] __aligned__;$/;"	v
+__aligned__	string_cp.c	/^uint64_t ref_int64_t[_MAX_LENGTH_ \/ 32] __aligned__;$/;"	v
+__aligned__	string_cp.c	/^uint8_t BASE_MASK[64] __aligned__ = {$/;"	v
+__aligned__	string_cp.c	/^uint8_t BASE_SHIFT[16] __aligned__ = {$/;"	v
+__aligned__	string_cp.c	41;"	d	file:
+__aligned__	string_cp.c	43;"	d	file:
+block	ssse3_popcount.c	355;"	d	file:
+body	ssse3_popcount.c	560;"	d	file:
+body	ssse3_popcount.c	579;"	d	file:
+c_convert2bit	string_cp.c	/^void c_convert2bit(char *str, int length, uint64_t *bits) {$/;"	f
+c_popcount	ssse3_popcount.c	/^uint32_t c_popcount(uint8_t* buffer, int chunks16) {$/;"	f
+functions	ssse3_popcount.c	/^char* functions[OPT_COUNT] = {$/;"	v
+functions	string_cp.c	/^char* functions[OPT_COUNT] = { "verify", "serial", "sse3" };$/;"	v
+help	ssse3_popcount.c	/^void help(const char* progname) {$/;"	f
+help	string_cp.c	/^void help(const char* progname) {$/;"	f
+main	ssse3_popcount.c	/^int main(int argc, char* argv[]) {$/;"	f
+main	string_cp.c	/^int main(int argc, char* argv[]) {$/;"	f
+popcnt	ssse3_popcount.c	/^uint32_t popcnt(uint64_t* buffer, int chunks8) {$/;"	f
+simplecnt	ssse3_popcount.c	/^uint32_t simplecnt(uint64_t *buffer, int chunks8) {$/;"	f
+sse2_popcount1	ssse3_popcount.c	/^uint32_t sse2_popcount1(uint8_t* buffer, int chunks16) {$/;"	f
+sse2_popcount2	ssse3_popcount.c	/^uint32_t sse2_popcount2(uint8_t* buffer, int chunks16) {$/;"	f
+sse2_popcount3	ssse3_popcount.c	/^uint32_t sse2_popcount3(uint8_t* buffer, int chunks16) {$/;"	f
+sse3_convert2bit	string_cp.c	/^void sse3_convert2bit(char *str, int length, uint64_t *bits) {$/;"	f
+ssse3_popcount1	ssse3_popcount.c	/^uint32_t ssse3_popcount1(uint8_t* buffer, int chunks16) {$/;"	f
+ssse3_popcount2	ssse3_popcount.c	/^uint32_t ssse3_popcount2(uint8_t* buffer, int chunks16) {$/;"	f
+ssse3_popcount3	ssse3_popcount.c	/^uint32_t ssse3_popcount3(uint8_t* buffer, int chunks16) {$/;"	f
+verify	ssse3_popcount.c	/^char verify(int index, uint32_t (*func)(uint64_t*, int), uint64_t *buffer, int chunks8, unsigned popcount_ref) {$/;"	f
+verify	ssse3_popcount.c	/^char verify(int index, uint32_t (*func)(uint8_t*, int), uint8_t *buffer, int chunks16, unsigned popcount_ref) {$/;"	f
