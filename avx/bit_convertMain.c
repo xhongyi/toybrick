@@ -18,8 +18,8 @@ char* functions[OPT_COUNT] = { "verify", "serial", "sse3" };
 
 char read_t[_MAX_LENGTH_] __aligned__;
 
-uint8_t read_bit_t[_MAX_LENGTH_ / 8] __aligned__;
-uint8_t ref_bit_t[_MAX_LENGTH_ / 8] __aligned__;
+uint8_t read_bit_t[_MAX_LENGTH_ / 4] __aligned__;
+uint8_t ref_bit_t[_MAX_LENGTH_ / 4] __aligned__;
 
 void help(const char* progname) {
 	int i;
@@ -153,6 +153,10 @@ int main(int argc, char* argv[]) {
 					printf("0");
 			}
 		}
+		printf("\n");
+
+		for (i = 0; i <= (length_count - 1) * 2 / (sizeof(ref_bit_t[0]) * 8); i++)
+			printf ("%2x", ref_bit_t[i]);
 		printf("\n");
 
 		failed |= verify(2, &sse3_convert2bit, read_t, length_count,

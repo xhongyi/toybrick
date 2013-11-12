@@ -1,24 +1,36 @@
-EXECUTABLE = popcount bit_convert string_cp ssse3_popcount
+EXECUTABLE = popcount bit_convert vector_filter string_cp ssse3_popcount
+
+CXX = g++
+
+CC = gcc
+
+CFLAGS = -O2 -march=native
 
 all: $(EXECUTABLE)
 
 popcount.o: popcount.c popcount.h
-	gcc -O2 -march=native -c popcount.c -o popcount.o
+	$(CC) $(CFLAGS) -c $< -o $@
 	
 popcount: popcount.h popcount.o popcountMain.c
-	gcc -O2 -march=native popcount.o popcountMain.c -o popcount
+	$(CC) $(CFLAGS) $^ -o $@
 
 bit_convert.o: bit_convert.c bit_convert.h
-	gcc -O2 -march=native -c bit_convert.c -o bit_convert.o
+	$(CC) $(CFLAGS) -c $< -o $@
 	
 bit_convert: bit_convert.o bit_convertMain.c
-	gcc -O2 -march=native bit_convert.o bit_convertMain.c -o bit_convert
+	$(CC) $(CFLAGS) $^ -o $@
+
+vector_filter.o: vector_filter.c vector_filter.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+vector_filter: vector_filter.o vector_filterMain.c
+	$(CC) $(CFLAGS) $^ -o $@
 
 string_cp: string_cp.c
-	g++ -O2 -DALIGN_DATA -march=native string_cp.c -o string_cp
+	$(CXX) $(CFLAGS) $< -o $@
 	
-ssse3_popcount:
-	g++ -O2 -DALIGN_DATA -march=native ssse3_popcount.c -o ssse3_popcount
+ssse3_popcount: ssse3_popcount.c
+	$(CXX) $(CFLAGS) $< -o $@
 	
 .PHONY : clean
 
