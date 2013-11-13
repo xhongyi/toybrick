@@ -118,11 +118,11 @@ uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
 	return result;
 }
 
-uint32_t ssse3_popcount(uint8_t* buffer, int chunks16) {
+uint32_t popcount_sse(uint8_t* buffer, int chunks16) {
 	return ssse3_popcount_core(buffer, chunks16, POPCOUNT_4bit);
 }
 
-uint32_t ssse3_popcount11(uint8_t* buffer, int chunks16) {
+uint32_t popcount11_sse(uint8_t* buffer, int chunks16) {
 	return ssse3_popcount_core(buffer, chunks16, POPCOUNT_4bit11);
 }
 

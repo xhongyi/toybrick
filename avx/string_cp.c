@@ -22,6 +22,7 @@
 
  initial release 24-05-2008, last update $Date$
  */
+#include "print.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -31,8 +32,6 @@
 #include <xmmintrin.h>
 #include <tmmintrin.h>
 #include <emmintrin.h>
-
-#include <iostream>
 
 #ifdef DEBUG
 #include <assert.h>
@@ -147,32 +146,6 @@ void c_convert2bit(char *str, int length, uint8_t *bits) {
 		 }
 		 */
 	}
-}
-
-void print128_bit(__m128i var) {
-	uint8_t *val = (uint8_t*) &var;
-	int i;
-	for (i = 0; i < 16; i++) {
-		 int m;
-		 for (m = 7; m >= 0; m--) {
-		 	if (val[i] & (1ULL << m) )
-				printf("1");
-			else
-				printf("0");
-		 }
-	}
-
-	printf("\n");
-		
-}
-
-void print128_hex(__m128i var)
-{
-	uint8_t *val = (uint8_t*) &var;
-	printf("Numerxcal: %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x\n", 
-		val[0], val[1], val[2], val[3], val[4], val[5], 
-		val[6], val[7], val[8], val[9], val[10], val[11],
-		val[12], val[13], val[14], val[15]);
 }
 
 void sse3_convert2bit(char *str, int length, uint8_t *bits) {

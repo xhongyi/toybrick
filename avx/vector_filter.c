@@ -10,6 +10,9 @@
 #include <nmmintrin.h>
 #include <tmmintrin.h>
 #include <stdio.h>
+#include <string.h>
+#include "popcount.h"
+#include "bit_convert.h"
 
 /*
  * By little endians, left shift should actually be right shift in x86 convention
@@ -173,4 +176,44 @@ __m128i shift_left_sse(__m128i vec, __m128i next_vec, int shift_num) {
 	shiftee = _mm_srli_epi64(shiftee, (shift_num % 4) * 2);
 
 	return _mm_or_si128(shiftee, carryover);
+}
+
+#define _MAX_LENGTH_ 320
+
+char read_t[_MAX_LENGTH_] __aligned__;
+char ref_t[_MAX_LENGTH_] __aligned__;
+uint8_t read_bit_t[_MAX_LENGTH_ / 4 + 16] __aligned__;
+uint8_t ref_bit_t[_MAX_LENGTH_ / 4 + 16] __aligned__;
+
+int bit_vec_filter_sse(char* read, char* ref, int length, int max_error) {
+	//Get ready the bits
+	memcpy(read_t, read, length * sizeof(char));
+	memcpy(ref_t, ref, length * sizeof(char));
+
+	sse3_convert2bit(read_t, length, read_bit_t);
+	sse3_convert2bit(ref_t, length, ref_bit_t);
+
+	int total_byte = length / 4;
+	const int unit_width = 16;
+
+	int total_difference = 0;
+
+	//Start iteration
+	int i;
+	__m128i prev_read_YMM = _mm_set1_epi8(0x0);
+	__m128i curr_read_YMM = *( (__m128i*)(read_bit_t) );
+	__m128i next_read_YMM = *( (__m128i*)(read_bit_t + unit_width) );
+	__m128i read_YMM;
+	__m128i ref_YMM;
+	__m128i temp_diff_YMM;
+	__m128i diff_YMM;
+	for (i = 0; i < total_byte; i += unit_width) {
+		next_read_YMM = *( (__m128i*)(read_bit_t + i + unit_width) );
+		ref_YMM = *( (__m128i*)(ref_bit_t + i) );
+		diff_YMM = __mm_xor_si128(curr_read_YMM, ref_YMM);
+
+		total_difference = popcount11_sse()
+		prev_read_YMM = curr_read_YMM;
+		curr_read_YMM = next_read_YMM;
+	}
 }

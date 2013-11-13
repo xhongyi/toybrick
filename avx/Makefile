@@ -29,8 +29,8 @@ vector_filter.o: vector_filter.c vector_filter.h
 vector_filter: print.o vector_filter.o vector_filterMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
-string_cp: string_cp.c
-	$(CXX) $(CFLAGS) $< -o $@
+string_cp: print.o string_cp.c
+	$(CXX) $(CFLAGS) $^ -o $@
 	
 ssse3_popcount: ssse3_popcount.c
 	$(CXX) $(CFLAGS) $< -o $@
