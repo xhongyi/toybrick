@@ -31,20 +31,20 @@ uint8_t POPCOUNT_4bit[16] __aligned__ = {
 
 uint8_t POPCOUNT_4bit11[16] __aligned__ = {
 /* 0 */0,
-/* 1 */0,
-/* 2 */0,
+/* 1 */1,
+/* 2 */1,
 /* 3 */1,
-/* 4 */0,
-/* 5 */0,
-/* 6 */0,
-/* 7 */1,
-/* 8 */0,
-/* 9 */0,
-/* a */0,
-/* b */1,
+/* 4 */1,
+/* 5 */2,
+/* 6 */2,
+/* 7 */2,
+/* 8 */1,
+/* 9 */2,
+/* a */2,
+/* b */2,
 /* c */1,
-/* d */1,
-/* e */1,
+/* d */2,
+/* e */2,
 /* f */2 };
 
 uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
@@ -166,7 +166,7 @@ uint32_t popcount11(uint8_t *buffer, int chunks16) {
 		uint8_t mask = 3;
 		for (j = 0; j < 4; j++) {
 			printf("%x ", mask);
-			if ( (buffer[i] & mask) == mask)
+			if (buffer[i] & mask)
 				result++;
 			mask = mask << 2;
 		}

@@ -8,22 +8,25 @@ CFLAGS = -O2 -march=native
 
 all: $(EXECUTABLE)
 
+print.o: print.c print.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
 popcount.o: popcount.c popcount.h
 	$(CC) $(CFLAGS) -c $< -o $@
 	
-popcount: popcount.h popcount.o popcountMain.c
+popcount: popcount.o print.o popcountMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 bit_convert.o: bit_convert.c bit_convert.h
 	$(CC) $(CFLAGS) -c $< -o $@
 	
-bit_convert: bit_convert.o bit_convertMain.c
+bit_convert: print.o bit_convert.o bit_convertMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 vector_filter.o: vector_filter.c vector_filter.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-vector_filter: vector_filter.o vector_filterMain.c
+vector_filter: print.o vector_filter.o vector_filterMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 string_cp: string_cp.c

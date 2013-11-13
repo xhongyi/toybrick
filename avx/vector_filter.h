@@ -16,5 +16,6 @@
 #include <nmmintrin.h>
 
 __m128i shift_right_sse(__m128i pri_vec, __m128i vec, int shift_num);
+__m128i shift_left_sse(__m128i vec, __m128i next_vec, int shift_num);
 
 #endif /* VECTOR_FILTER_H_ */
