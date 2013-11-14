@@ -48,13 +48,15 @@ uint8_t POPCOUNT_4bit11[16] __aligned__ = {
 /* f */2 };
 
 uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
-	static char MASK_4bit[16] = {0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf};
+	static char MASK_4bit[16] = { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf,
+			0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
 
 	uint32_t result;
 
 	__asm__ volatile ("movdqu (%%eax), %%xmm7" : : "a" (map));
 	__asm__ volatile ("movdqu (%%eax), %%xmm6" : : "a" (MASK_4bit));
-	__asm__ volatile ("pxor    %%xmm5, %%xmm5" : : ); // xmm5 -- global accumulator
+	__asm__ volatile ("pxor    %%xmm5, %%xmm5" : : );
+	// xmm5 -- global accumulator
 
 	result = 0;
 
@@ -68,54 +70,105 @@ uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
 		if (chunks16 > MAX) {
 			k = MAX;
 			chunks16 -= MAX;
-		}
-		else {
+		} else {
 			k = chunks16;
 			chunks16 = 0;
 		}
 #undef MAX
 
-		__asm__ volatile ("pxor %xmm4, %xmm4"); // xmm4 -- local accumulator
-		for (n=0; n < k; n++) {
+		__asm__ volatile ("pxor %xmm4, %xmm4");
+		// xmm4 -- local accumulator
+		for (n = 0; n < k; n++) {
 			__asm__ volatile(
-				"movdqa	  (%%eax), %%xmm0	\n"
-				"movdqa    %%xmm0, %%xmm1	\n"
+					"movdqa	  (%%eax), %%xmm0	\n"
+					"movdqa    %%xmm0, %%xmm1	\n"
 
-				"psrlw         $4, %%xmm1	\n"
-				"pand      %%xmm6, %%xmm0	\n"	// xmm0 := lower nibbles
-				"pand      %%xmm6, %%xmm1	\n"	// xmm1 := higher nibbles
+					"psrlw         $4, %%xmm1	\n"
+					"pand      %%xmm6, %%xmm0	\n"	// xmm0 := lower nibbles
+					"pand      %%xmm6, %%xmm1	\n"// xmm1 := higher nibbles
 
-				"movdqa    %%xmm7, %%xmm2	\n"
-				"movdqa    %%xmm7, %%xmm3	\n"	// get popcount
-				"pshufb    %%xmm0, %%xmm2	\n"	// for all nibbles
-				"pshufb    %%xmm1, %%xmm3	\n"	// using PSHUFB
+					"movdqa    %%xmm7, %%xmm2	\n"
+					"movdqa    %%xmm7, %%xmm3	\n"// get popcount
+					"pshufb    %%xmm0, %%xmm2	\n"// for all nibbles
+					"pshufb    %%xmm1, %%xmm3	\n"// using PSHUFB
 
-				"paddb     %%xmm2, %%xmm4	\n"	// update local
-				"paddb     %%xmm3, %%xmm4	\n"	// accumulator
+					"paddb     %%xmm2, %%xmm4	\n"// update local
+					"paddb     %%xmm3, %%xmm4	\n"// accumulator
 
-				:
-				: "a" (&buffer[i])
+					:
+					: "a" (&buffer[i])
 			);
 			i += 16;
 		}
 
 		// update global accumulator (two 32-bits counters)
 		__asm__ volatile (
-			"pxor	%xmm0, %xmm0		\n"
-			"psadbw	%xmm0, %xmm4		\n"
-			"paddd	%xmm4, %xmm5		\n"
+				"pxor	%xmm0, %xmm0		\n"
+				"psadbw	%xmm0, %xmm4		\n"
+				"paddd	%xmm4, %xmm5		\n"
 		);
 	}
 
 	// finally add together 32-bits counters stored in global accumulator
 	__asm__ volatile (
-		"movhlps   %%xmm5, %%xmm0	\n"
-		"paddd     %%xmm5, %%xmm0	\n"
-		"movd      %%xmm0, %%eax	\n"
-		: "=a" (result)
+			"movhlps   %%xmm5, %%xmm0	\n"
+			"paddd     %%xmm5, %%xmm0	\n"
+			"movd      %%xmm0, %%eax	\n"
+			: "=a" (result)
 	);
 
 	return result;
+}
+
+uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
+	static char MASK_4bit[16] = { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf,
+			0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
+
+	uint32_t result;
+
+	__asm__ volatile ("movdqu (%%eax), %%xmm7" : : "a" (map));
+	__asm__ volatile ("movdqu (%%eax), %%xmm6" : : "a" (MASK_4bit));
+	// xmm5 -- global accumulator
+
+	result = 0;
+
+	__asm__ volatile ("pxor %xmm4, %xmm4");
+	// xmm4 -- local accumulator
+
+	__asm__ volatile(
+			"movdqa	  (%%eax), %%xmm0	\n"
+			"movdqa    %%xmm0, %%xmm1	\n"
+
+			"psrlw         $4, %%xmm1	\n"
+			"pand      %%xmm6, %%xmm0	\n"	// xmm0 := lower nibbles
+			"pand      %%xmm6, %%xmm1	\n"// xmm1 := higher nibbles
+
+			"movdqa    %%xmm7, %%xmm2	\n"
+			"movdqa    %%xmm7, %%xmm3	\n"// get popcount
+			"pshufb    %%xmm0, %%xmm2	\n"// for all nibbles
+			"pshufb    %%xmm1, %%xmm3	\n"// using PSHUFB
+
+			"paddb     %%xmm2, %%xmm4	\n"// update local
+			"paddb     %%xmm3, %%xmm4	\n"// accumulator
+
+			"pxor	%xmm0, %xmm0		\n"
+			"psadbw	%xmm0, %xmm4		\n"
+			"movhlps   %%xmm4, %%xmm0	\n"
+			"paddd     %%xmm4, %%xmm0	\n"
+			"movd   %xmm0, %eax			\n"
+			: "=a" (result)
+			: "a" (&reg)
+	);
+
+	return result;
+}
+
+uint32_t popcount_m128i_sse(__m128i buffer) {
+
+}
+
+uint32_t popcount11_m128i_sse(__m128i buffer) {
+
 }
 
 uint32_t popcount_sse(uint8_t* buffer, int chunks16) {
