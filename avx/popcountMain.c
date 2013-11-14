@@ -14,10 +14,11 @@
 
 uint8_t buffer[16 * MAX_CHUNKS] __aligned__;
 
-#define OPT_COUNT 6
+#define OPT_COUNT 8
 
 char* functions[OPT_COUNT] = { "verify", "popcount", "popcount11",
-		"builtin_popcount", "ssse3_popcount", "ssse3_popcount11" };
+		"builtin_popcount", "popcount_sse", "popcount11_sse",
+		"popcount_m128i_sse", "popcount11_m128i_sse" };
 
 void help(const char* progname) {
 	int i;
@@ -32,7 +33,7 @@ void help(const char* progname) {
 }
 
 #define VERIFY(index) \
-			printf("%10s -> %d %s\n", \
+			printf("%15s -> %d %s\n", \
 			functions[index], \
 			popcount, \
 			(popcount_ref != popcount) ? "FAILED!!!" : "" \
@@ -40,15 +41,31 @@ void help(const char* progname) {
 		if (popcount_ref != popcount) \
 			failed = 1;
 
-char verify(int index, uint32_t (*func)(uint8_t*, int), uint8_t *buffer, int chunks16, unsigned popcount_ref) {
+char verify(int index, uint32_t (*func)(uint8_t*, int), uint8_t *buffer,
+		int chunks16, unsigned popcount_ref) {
 	char failed;
 	int popcount = (*func)(buffer, chunks16);
 	VERIFY(index);
 	return failed;
 }
 
+char verify_m128i(int index, uint32_t (*func)(__m128i), uint8_t *buffer,
+		int chunks16, unsigned popcount_ref) {
+	char failed;
+	int popcount = 0;
+	__m128i reg;
+	int i;
+	for (i = 0; i < chunks16; i++) {
+		reg = *((__m128i *) (buffer + i * 16));
+		popcount += (*func)(reg);
+	}
+	VERIFY(index);
+	return failed;
+}
+
 int main(int argc, char* argv[]) {
 	// prog parametrs
+	int result;
 	int function;
 	int chunks_count;
 	int repeat_count;
@@ -89,7 +106,7 @@ int main(int argc, char* argv[]) {
 		repeat_count = default_repeat_count;
 
 	// fill buffer with random data
-	srand(time(NULL ));
+	srand(time(NULL));
 	printf("Data: ");
 	for (i = 0; i < sizeof(buffer); i++)
 		buffer[i] = rand() % 256;
@@ -116,12 +133,14 @@ int main(int argc, char* argv[]) {
 		printf("%10s -> %d\n", functions[1], popcount_ref);
 		printf("%10s -> %d\n", functions[2], popcount_ref11);
 
-
 		failed |= verify(3, &builtin_popcount, buffer, chunks_count,
 				popcount_ref);
-		failed |= verify(4, &ssse3_popcount, buffer, chunks_count,
+		failed |= verify(4, &popcount_sse, buffer, chunks_count, popcount_ref);
+		failed |= verify(5, &popcount11_sse, buffer, chunks_count,
+				popcount_ref11);
+		failed |= verify_m128i(6, &popcount_m128i_sse, buffer, chunks_count,
 				popcount_ref);
-		failed |= verify(5, &ssse3_popcount11, buffer, chunks_count,
+		failed |= verify_m128i(7, &popcount11_m128i_sse, buffer, chunks_count,
 				popcount_ref11);
 
 		if (failed)
@@ -146,12 +165,32 @@ int main(int argc, char* argv[]) {
 
 	case 4:
 		while (repeat_count--)
-			ssse3_popcount(buffer, chunks_count);
+			popcount_sse(buffer, chunks_count);
 		break;
 
 	case 5:
 		while (repeat_count--)
-			ssse3_popcount11(buffer, chunks_count);
+			popcount11_sse(buffer, chunks_count);
+		break;
+
+	case 6:
+		while (repeat_count--) {
+			result = 0;
+			for (i = 0; i < chunks_count; i++) {
+				__m128i reg = *((__m128i *) (buffer + i * 16));
+				result += popcount_m128i_sse(reg);
+			}
+		}
+		break;
+
+	case 7:
+		while (repeat_count--) {
+			result = 0;
+			for (i = 0; i < chunks_count; i++) {
+				__m128i reg = *((__m128i *) (buffer + i * 16));
+				result += popcount11_m128i_sse(reg);
+			}
+		}
 		break;
 
 	}

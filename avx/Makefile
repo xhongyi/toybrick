@@ -26,7 +26,7 @@ bit_convert: print.o bit_convert.o bit_convertMain.c
 vector_filter.o: vector_filter.c vector_filter.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-vector_filter: print.o vector_filter.o vector_filterMain.c
+vector_filter: print.o bit_convert.o popcount.o vector_filter.o vector_filterMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 string_cp: print.o string_cp.c

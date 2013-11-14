@@ -13,6 +13,11 @@
 #endif
 
 #include <stdint.h>
+#include <nmmintrin.h>
+
+uint32_t popcount_m128i_sse(__m128i reg);
+
+uint32_t popcount11_m128i_sse(__m128i reg);
 
 uint32_t popcount_sse(uint8_t* buffer, int chunks16);
 
