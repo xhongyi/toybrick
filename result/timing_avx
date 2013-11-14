@@ -1,0 +1,35 @@
+time ./vector_filter 128 1 1000000000 50
+
+real    25m22.882s
+user    25m15.487s
+sys     0m4.932s
+
+
+time ./popcount popcount11_m128i_sse 2 50000000000            
+Data: C386AD92BA27CE3D81EA683981194C5501EA58827523720D2E25A70E8D7C
+chunks=2, repeat count=50000000000
+        Total time: 309.690000
+
+real    5m10.043s
+user    5m9.651s
+sys     0m0.044s
+
+
+time ./shift 1 50000000000 128
+length=128, repeat count=100000000000
+
+real	8m58.959s
+user	8m58.110s
+sys	0m0.224s
+
+
+time ./timeSSE 1 50000000000 128                              
+error=1, length=128, repeat count=100000000000
+
+real    1m20.786s
+user    1m20.669s
+sys     0m0.020s
+
+
+
+
