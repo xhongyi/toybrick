@@ -13,8 +13,6 @@
 #include <nmmintrin.h>
 #include <emmintrin.h>
 
-uint8_t buff[32] __aligned__;
-
 #define _MAX_LENGTH_ 320
 
 char read_t[_MAX_LENGTH_] __aligned__;
@@ -60,6 +58,7 @@ int main(int argc, char* argv[]) {
 	int length = 128;
 	int error = 0;
 	int repeat_count = 10000;
+	int average_loc = 10;
 
 	strcpy(read_t,
 			"ACGCTAGTAGCCGGAATAACAGGTAGGCCTACATTTTCTATACGGCGCCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
@@ -72,9 +71,11 @@ int main(int argc, char* argv[]) {
 		error = atoi(argv[2]);
 	if (argc >= 4)
 		repeat_count = atoi(argv[3]);
+	if (argc >= 5)
+		average_loc = atoi(argv[4]);
 
 	while (repeat_count--)
-		bit_vec_filter_sse(read_t, ref_t, length, error);
+		bit_vec_filter_sse_simulate(read_t, ref_t, length, error, average_loc);
 //	if (bit_vec_filter_sse(read_t, ref_t, length, error))
 //		printf("Pass Filter\n");
 //	else

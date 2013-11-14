@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 	int result;
 	int function;
 	int chunks_count;
-	int repeat_count;
+	unsigned long long  repeat_count;
 	int default_chunks_count = 100;
 	int default_repeat_count = 100000;
 
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 
 	// - repeat count
 	if (argc >= 4) {
-		repeat_count = atoi(argv[3]);
+		repeat_count = strtoull(argv[3], NULL, 10);
 		if (repeat_count <= 0)
 			help(argv[0]);
 	} else
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 	char failed = 0;
 
 	// run
-	printf("chunks=%d, repeat count=%d\n", chunks_count, repeat_count);
+	printf("chunks=%d, repeat count=%llu\n", chunks_count, repeat_count);
 
 	time_beg = clock();
 
