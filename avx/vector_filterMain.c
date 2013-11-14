@@ -59,21 +59,26 @@ int main(int argc, char* argv[]) {
 
 	int length = 128;
 	int error = 0;
+	int repeat_count = 10000;
 
 	strcpy(read_t,
 			"ACGCTAGTAGCCGGAATAACAGGTAGGCCTACATTTTCTATACGGCGCCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
 	strcpy(ref_t,
-			"ACGCTAGTAGCCGGAATAAAGGTAGGCCTACATTTCTATACGGCGCCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGGAA");
+			"ACGCTAGTAGCCGGAATAAAGGTAGGCCTACATTTTTCTATACGGCGCCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
 
 	if (argc >= 2)
 		length = atoi(argv[1]);
 	if (argc >= 3)
 		error = atoi(argv[2]);
+	if (argc >= 4)
+		repeat_count = atoi(argv[3]);
 
-	if (bit_vec_filter_sse(read_t, ref_t, length, error) )
-		printf("Pass Filter\n");
-	else
-		printf("Fail Filter\n");
+	while (repeat_count--)
+		bit_vec_filter_sse(read_t, ref_t, length, error);
+//	if (bit_vec_filter_sse(read_t, ref_t, length, error))
+//		printf("Pass Filter\n");
+//	else
+//		printf("Fail Filter\n");
 
 	return 0;
 

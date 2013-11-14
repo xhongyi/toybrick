@@ -220,14 +220,14 @@ int bit_vec_filter_sse(char* read, char* ref, int length, int max_error) {
 		diff_XMM = _mm_xor_si128(curr_read_XMM, ref_XMM);
 
 		for (j = 1; j <= max_error; j++) {
-//			//Right shift
-//			read_XMM = shift_right_sse(prev_read_XMM, curr_read_XMM, j);
-//			temp_diff_XMM = _mm_xor_si128(read_XMM, ref_XMM);
-//			if (i == 0) {
-//				mask = shift_right_sse(zero_mask, one_mask, j);
-//				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
-//			}
-//			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
+			//Right shift
+			read_XMM = shift_right_sse(prev_read_XMM, curr_read_XMM, j);
+			temp_diff_XMM = _mm_xor_si128(read_XMM, ref_XMM);
+			if (i == 0) {
+				mask = shift_right_sse(zero_mask, one_mask, j);
+				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
+			}
+			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 
 //			printf("%20s: ", "after hamming");
 //			print128_bit(diff_XMM);
