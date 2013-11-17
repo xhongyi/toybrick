@@ -1,4 +1,4 @@
-EXECUTABLE = popcount bit_convert vector_filter string_cp ssse3_popcount
+EXECUTABLE = popcount bit_convert vector_filter string_cp ssse3_popcount shift
 
 CXX = g++
 
@@ -29,11 +29,19 @@ vector_filter.o: vector_filter.c vector_filter.h
 vector_filter: print.o bit_convert.o popcount.o vector_filter.o vector_filterMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
+shift: print.o vector_filter.o popcount.o bit_convert.o shiftMain.c
+	$(CC) $(CFLAGS) $^ -o $@
+
+timeSSE: timeSSE.c
+	$(CC) $(CFLAGS) $< -o $@
+
 string_cp: print.o string_cp.c
 	$(CXX) $(CFLAGS) $^ -o $@
 	
 ssse3_popcount: ssse3_popcount.c
 	$(CXX) $(CFLAGS) $< -o $@
+	
+
 	
 .PHONY : clean
 
