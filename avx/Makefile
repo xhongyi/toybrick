@@ -4,7 +4,7 @@ CXX = g++
 
 CC = gcc
 
-CFLAGS = -O2 -march=native
+CFLAGS = -O3 -march=native
 
 all: $(EXECUTABLE)
 

@@ -16,7 +16,7 @@
 #include <nmmintrin.h>
 
 // read and ref need to be 16 aligned
-int bit_vec_filter_sse_simulate(char* read, char* ref, int length, int max_error, int loc_num);
+void bit_vec_filter_sse_simulate(char* read, char* ref, int length, int max_error, int loc_num);
 
 int bit_vec_filter_sse(char* read, char* ref, int length, int max_error);
 int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length, int max_error);

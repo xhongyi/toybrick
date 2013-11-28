@@ -14,6 +14,25 @@
 #include "popcount.h"
 #include "bit_convert.h"
 
+uint8_t MASK_01[32] __aligned__ = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
+		0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
+		0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
+		0x55 };
+
+//Right Shift Mask
+uint8_t MASK_SSE_RS[128] __aligned__
+= { 0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0x00, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0xf0, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0x00, 0xc0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
+
 /*
  * By little endians, left shift should actually be right shift in x86 convention
  */
@@ -180,6 +199,22 @@ __m128i shift_left_sse(__m128i vec, __m128i next_vec, int shift_num) {
 	return _mm_or_si128(shiftee, carryover);
 }
 
+__m128i xor11complement_sse(__m128i input) {
+	__m128i temp, result;
+	__m128i mask = _mm_load_si128((__m128i *) MASK_01);
+
+	temp = _mm_and_si128(input, mask);
+	temp = _mm_slli_epi16(temp, 1);
+	result = _mm_or_si128(temp, input);
+
+	mask = _mm_slli_epi16(mask, 1);
+	temp = _mm_and_si128(input, mask);
+	temp = _mm_srli_epi16(temp, 1);
+	result = _mm_or_si128(result, temp);
+
+	return result;
+}
+
 #define _MAX_LENGTH_ 320
 
 uint8_t read_bit_t[_MAX_LENGTH_ / 4 + 16] __aligned__;
@@ -187,7 +222,7 @@ uint8_t ref_bit_t[_MAX_LENGTH_ / 4 + 16] __aligned__;
 //__m128i zero_mask = _mm_set1_epi8(0x00);
 //__m128i one_mask = _mm_set1_epi8(0xff);
 
-const int unit_width = 16;
+const int sse_unit_width = 16;
 const int byte_width = 4;
 
 int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
@@ -201,52 +236,63 @@ int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 
 	//Start iteration
 	int i, j;
+	//read data
 	__m128i prev_read_XMM = _mm_set1_epi8(0x0);
 	__m128i curr_read_XMM = *((__m128i *) (read_bit_t));
-	__m128i next_read_XMM = *((__m128i *) (read_bit_t + unit_width));
+	//ref data
+	__m128i prev_ref_XMM = _mm_set1_epi8(0x0);
+	__m128i curr_ref_XMM = *((__m128i *) (ref_bit_t));
+
 	__m128i read_XMM;
 	__m128i ref_XMM;
 	__m128i temp_diff_XMM;
 	__m128i diff_XMM;
 	__m128i mask;
-	for (i = 0; i < total_byte; i += unit_width) {
-		next_read_XMM = *((__m128i *) (read_bit_t + i + unit_width));
-		ref_XMM = *((__m128i *) (ref_bit_t + i));
+	for (i = 0; i < total_byte; i += sse_unit_width) {
+//		printf("\niteration: %d\n", i);
 
-		diff_XMM = _mm_xor_si128(curr_read_XMM, ref_XMM);
+		curr_read_XMM = *((__m128i *) (read_bit_t + i));
+		curr_ref_XMM = *((__m128i *) (ref_bit_t + i));
+
+		diff_XMM = _mm_xor_si128(curr_read_XMM, curr_ref_XMM);
+		diff_XMM = xor11complement_sse(diff_XMM);
 
 		for (j = 1; j <= max_error; j++) {
-			//Right shift
+			//Right shift read
 			read_XMM = shift_right_sse(prev_read_XMM, curr_read_XMM, j);
-			temp_diff_XMM = _mm_xor_si128(read_XMM, ref_XMM);
+			temp_diff_XMM = _mm_xor_si128(read_XMM, curr_ref_XMM);
+			temp_diff_XMM = xor11complement_sse(temp_diff_XMM);
 			if (i == 0) {
-				mask = shift_right_sse(zero_mask, one_mask, j);
+//				mask = shift_right_sse(zero_mask, one_mask, j);
+				mask = _mm_load_si128(
+						(__m128i *) (MASK_SSE_RS + (j - 1) * sse_unit_width));
+
 				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
 			}
+
 			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 
-			//			printf("%20s: ", "after hamming");
-			//			print128_bit(diff_XMM);
+			//Right shift ref
+			ref_XMM = shift_right_sse(prev_ref_XMM, curr_ref_XMM, j);
+			temp_diff_XMM = _mm_xor_si128(curr_read_XMM, ref_XMM);
+			temp_diff_XMM = xor11complement_sse(temp_diff_XMM);
+			if (i == 0) {
+//				mask = shift_right_sse(zero_mask, one_mask, j);
+				mask = _mm_load_si128(
+						(__m128i *) (MASK_SSE_RS + (j - 1) * sse_unit_width));
 
-			//Left shift
-			read_XMM = shift_left_sse(curr_read_XMM, next_read_XMM, j);
-			temp_diff_XMM = _mm_xor_si128(read_XMM, ref_XMM);
-			if (length - j < (i + unit_width) * byte_width) {
-				mask = shift_left_sse(one_mask, zero_mask, j);
+//				printf("Mask: \n");
+//				print128_bit(mask);
 				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
-
-				//				printf("%20s: ", "right shift hamming");
-				//				print128_bit(temp_diff_XMM);
 			}
+
 			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
-			//			printf("%20s: ", "and-up");
-			//			print128_bit(diff_XMM);
 		}
 
 		total_difference += popcount11_m128i_sse(diff_XMM);
 
 		prev_read_XMM = curr_read_XMM;
-		curr_read_XMM = next_read_XMM;
+		prev_ref_XMM = curr_ref_XMM;
 
 		if (total_difference > max_error)
 			return 0;
@@ -263,10 +309,10 @@ int bit_vec_filter_sse(char* read, char* ref, int length, int max_error) {
 	sse3_convert2bit(read, length, read_bit_t);
 	sse3_convert2bit(ref, length, ref_bit_t);
 
-	bit_vec_filter_m128_sse(read_bit_t, ref_bit_t, length, max_error);
+	return bit_vec_filter_m128_sse(read_bit_t, ref_bit_t, length, max_error);
 }
 
-int bit_vec_filter_sse_simulate(char* read, char* ref, int length,
+void bit_vec_filter_sse_simulate(char* read, char* ref, int length,
 		int max_error, int loc_num) {
 	//Get ready the bits
 //	memcpy(read_t, read, length * sizeof(char));

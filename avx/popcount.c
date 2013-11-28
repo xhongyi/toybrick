@@ -12,46 +12,44 @@
 #endif
 
 uint8_t POPCOUNT_4bit[16] __aligned__ = {
-	/* 0 */0,
-	/* 1 */1,
-	/* 2 */1,
-	/* 3 */2,
-	/* 4 */1,
-	/* 5 */2,
-	/* 6 */2,
-	/* 7 */3,
-	/* 8 */1,
-	/* 9 */2,
-	/* a */2,
-	/* b */3,
-	/* c */2,
-	/* d */3,
-	/* e */3,
-	/* f */4
-};
+/* 0 */0,
+/* 1 */1,
+/* 2 */1,
+/* 3 */2,
+/* 4 */1,
+/* 5 */2,
+/* 6 */2,
+/* 7 */3,
+/* 8 */1,
+/* 9 */2,
+/* a */2,
+/* b */3,
+/* c */2,
+/* d */3,
+/* e */3,
+/* f */4 };
 
 uint8_t POPCOUNT_4bit11[16] __aligned__ = {
-	/* 0 */0,
-	/* 1 */1,
-	/* 2 */1,
-	/* 3 */1,
-	/* 4 */1,
-	/* 5 */2,
-	/* 6 */2,
-	/* 7 */2,
-	/* 8 */1,
-	/* 9 */2,
-	/* a */2,
-	/* b */2,
-	/* c */1,
-	/* d */2,
-	/* e */2,
-	/* f */2
-};
+/* 0 */0,
+/* 1 */1,
+/* 2 */1,
+/* 3 */1,
+/* 4 */1,
+/* 5 */2,
+/* 6 */2,
+/* 7 */2,
+/* 8 */1,
+/* 9 */2,
+/* a */2,
+/* b */2,
+/* c */1,
+/* d */2,
+/* e */2,
+/* f */2 };
 
 uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
-	static char MASK_4bit[16] = { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf,
-			0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
+	static char MASK_4bit[16] __aligned__ = { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf,
+			0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
 
 	uint32_t result;
 
@@ -123,8 +121,8 @@ uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
 }
 
 uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
-	static char MASK_4bit[16] = { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf,
-			0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
+	static char MASK_4bit[16] __aligned__ = { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf,
+			0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
 
 	uint32_t result;
 
