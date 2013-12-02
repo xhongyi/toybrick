@@ -2,9 +2,10 @@ EXECUTABLE = popcount bit_convert vector_filter string_cp ssse3_popcount shift
 
 CXX = g++
 
-CC = gcc
+CC = g++
 
-CFLAGS = -O3 -march=native
+#CFLAGS = -O3 -march=native
+CFLAGS = -P -E
 
 all: $(EXECUTABLE)
 

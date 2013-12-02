@@ -5,6 +5,7 @@
  *      Author: hxin
  */
 #include "popcount.h"
+#include <stdio.h>
 #include <nmmintrin.h>
 
 #ifdef DEBUG

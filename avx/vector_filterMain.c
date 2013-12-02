@@ -18,8 +18,8 @@
 char read_t[_MAX_LENGTH_] __aligned__;
 char ref_t[_MAX_LENGTH_] __aligned__;
 
-uint8_t read_bit_t[_MAX_LENGTH_ / 4] __aligned__;
-uint8_t ref_bit_t[_MAX_LENGTH_ / 4] __aligned__;
+//uint8_t read_bit_t[_MAX_LENGTH_ / 4] __aligned__;
+//uint8_t ref_bit_t[_MAX_LENGTH_ / 4] __aligned__;
 
 int main(int argc, char* argv[]) {
 
@@ -42,12 +42,12 @@ int main(int argc, char* argv[]) {
 	if (argc >= 5)
 		average_loc = atoi(argv[4]);
 
-	while (repeat_count--)
-		bit_vec_filter_sse_simulate(read_t, ref_t, length, error, average_loc);
-//	if (bit_vec_filter_sse(read_t, ref_t, length, error))
-//		printf("Pass Filter\n");
-//	else
-//		printf("Fail Filter\n");
+//	while (repeat_count--)
+//		bit_vec_filter_sse_simulate(read_t, ref_t, length, error, average_loc);
+	if (bit_vec_filter_sse(read_t, ref_t, length, error))
+		printf("Pass Filter\n");
+	else
+		printf("Fail Filter\n");
 
 	return 0;
 
