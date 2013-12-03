@@ -4,7 +4,7 @@ CXX = g++
 
 CC = g++
 
-CFLAGS = -O3 -march=native
+CFLAGS = -O3 -march=native -I .
 #CFLAGS = -O3 -march=native -P -E
 
 all: $(EXECUTABLE)
@@ -27,7 +27,10 @@ bit_convert: print.o bit_convert.o bit_convertMain.c
 vector_filter.o: vector_filter.c vector_filter.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-vector_filter: print.o bit_convert.o popcount.o vector_filter.o vector_filterMain.c
+mask.o: mask.c mask.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+vector_filter: mask.o print.o bit_convert.o popcount.o vector_filter.o vector_filterMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 shift: print.o vector_filter.o popcount.o bit_convert.o shiftMain.c
