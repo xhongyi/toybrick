@@ -5,7 +5,7 @@
  *      Author: hxin
  */
 
-#ifndef BOOST_PP_IS_ITERATING
+//#ifndef BOOST_PP_IS_ITERATING
 
 //#include "print.h"
 #include <stdint.h>
@@ -14,6 +14,9 @@
 #include <string.h>
 #include <nmmintrin.h>
 #include <emmintrin.h>
+
+#include "mask.h"
+/*
 #include <boost/preprocessor/repetition.hpp>
 #include <boost/preprocessor/iteration.hpp>
 #include <boost/preprocessor/arithmetic.hpp>
@@ -25,10 +28,10 @@
 #define BYTE_BASE_NUM		BOOST_PP_DIV(8, BASE_SIZE)
 #define SSE_BYTE_NUM		BOOST_PP_DIV(SSE_BIT_LENGTH, 8)
 
-uint8_t MASK_SSE_END[SSE_BIT_LENGTH * SSE_BYTE_NUM] = {
+uint8_t MASK_SSE_END[SSE_BIT_LENGTH * SSE_BYTE_NUM / BASE_SIZE] = {
 
 #define BOOST_PP_ITERATION_LIMITS	(0, SSE_BIT_LENGTH / 2  - 1)
-#define BOOST_PP_FILENAME_1			"/home/hxin/workspace/toybrick/avx/vector_filterMain.c" // this file
+#define BOOST_PP_FILENAME_1			"vector_filterMain.c" // this file
 #include BOOST_PP_ITERATE()
 
 #else // BOOST_PP_IS_ITERATING
@@ -44,16 +47,21 @@ uint8_t MASK_SSE_END[SSE_BIT_LENGTH * SSE_BYTE_NUM] = {
 #endif	//FF_NUM != 0
 
 #if		BOOST_PP_MOD(I, BYTE_BASE_NUM) == 1
-		0x03,
+		0x03
 #elif	BOOST_PP_MOD(I, BYTE_BASE_NUM) == 2
-		0x0f,
+		0x0f
 #elif	BOOST_PP_MOD(I, BYTE_BASE_NUM) == 3
-		0x3f,
+		0x3f
 #else
-		0x00,
+		0x00
 #endif	//End of switch
 
 #define ZZ_NUM	BOOST_PP_SUB( BOOST_PP_SUB(SSE_BYTE_NUM, 1), FF_NUM)
+
+#if		ZZ_NUM != 0
+		BOOST_PP_COMMA()
+#endif	//ZZ_NUM != 0
+
 		BOOST_PP_ENUM(ZZ_NUM, PRINT_DATA, 0x00)
 
 #if I != BOOST_PP_ITERATION_FINISH()
@@ -68,6 +76,8 @@ uint8_t MASK_SSE_END[SSE_BIT_LENGTH * SSE_BYTE_NUM] = {
 #endif // BOOST_PP_IS_ITERATING
 #ifndef BOOST_PP_IS_ITERATING
 };
+
+*/
 
 #define _MAX_LENGTH_ 320
 
@@ -98,11 +108,11 @@ int main(int argc, char* argv[]) {
 	if (argc >= 5)
 		average_loc = atoi(argv[4]);
 
-	for (int i = 0; i < SSE_BIT_LENGTH * SSE_BYTE_NUM; i++) {
-		if (i % SSE_BYTE_NUM == 0)
-			printf("\n");
-		printf("%x ", MASK_SSE_END[i]);
-	}
+//	for (int i = 0; i < SSE_BIT_LENGTH * SSE_BYTE_NUM / BASE_SIZE; i++) {
+//		if (i % SSE_BYTE_NUM == 0)
+//			printf("\n");
+//		printf("%x ", MASK_SSE_END[i]);
+//	}
 
 	printf("\n");
 
@@ -117,4 +127,4 @@ int main(int argc, char* argv[]) {
 
 }
 
-#endif
+//#endif

@@ -13,6 +13,7 @@
 #include <string.h>
 #include "popcount.h"
 #include "bit_convert.h"
+#include "mask.h"
 
 uint8_t MASK_01[32] __aligned__ = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
 		0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
@@ -32,20 +33,6 @@ uint8_t MASK_SSE_BEG[128] __aligned__
 		0x00, 0xc0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-
-//ED Ending Mask
-//uint8_t MASK_SSE_END[128] __aligned__
-//= { 0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-//		0xff, 0xff, 0xff, 0xff, 0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-//		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0xff, 0xff, 0xff,
-//		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-//		0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-//		0xff, 0xff, 0xff, 0xff, 0x00, 0xfc, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-//		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0xf0, 0xff, 0xff,
-//		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-//		0x00, 0xc0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-//		0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-//		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 /*
  * By little endians, left shift should actually be right shift in x86 convention
@@ -236,15 +223,12 @@ uint8_t ref_bit_t[_MAX_LENGTH_ / 4 + 16] __aligned__;
 //__m128i zero_mask = _mm_set1_epi8(0x00);
 //__m128i one_mask = _mm_set1_epi8(0xff);
 
-const int sse_unit_width = 16;
-const int byte_width = 4;
-
 int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 		int max_error) {
 	const __m128i zero_mask = _mm_set1_epi8(0x00);
 	const __m128i one_mask = _mm_set1_epi8(0xff);
 
-	int total_byte = length / byte_width;
+	int total_byte = length / BYTE_BASE_NUM;
 
 	int total_difference = 0;
 
@@ -262,7 +246,7 @@ int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 	__m128i temp_diff_XMM;
 	__m128i diff_XMM;
 	__m128i mask;
-	for (i = 0; i < total_byte; i += sse_unit_width) {
+	for (i = 0; i < total_byte; i += SSE_BYTE_NUM) {
 //		printf("\niteration: %d\n", i);
 
 		curr_read_XMM = *((__m128i *) (read_bit_t + i));
@@ -279,11 +263,20 @@ int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 			if (i == 0) {
 //				mask = shift_right_sse(zero_mask, one_mask, j);
 				mask = _mm_load_si128(
-						(__m128i *) (MASK_SSE_BEG + (j - 1) * sse_unit_width));
+						(__m128i *) (MASK_SSE_BEG + (j - 1) * SSE_BYTE_NUM));
 
 				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
 			}
-//			if ()
+			if (i + SSE_BYTE_NUM >= total_byte) {
+				if (length % SSE_BASE_NUM) {
+					mask =
+							_mm_load_si128(
+									(__m128i *) (MASK_SSE_END
+											+ (length % SSE_BASE_NUM) / 2
+													* SSE_BYTE_NUM));
+					temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
+				}
+			}
 
 			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 
@@ -294,13 +287,25 @@ int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 			if (i == 0) {
 //				mask = shift_right_sse(zero_mask, one_mask, j);
 				mask = _mm_load_si128(
-						(__m128i *) (MASK_SSE_BEG + (j - 1) * sse_unit_width));
+						(__m128i *) (MASK_SSE_BEG + (j - 1) * SSE_BYTE_NUM));
 
 //				printf("Mask: \n");
 //				print128_bit(mask);
 				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
 			}
-//			if ()
+			if (i == total_byte - 1) {
+				printf ("FUCK ME\n");
+				if (length % SSE_BASE_NUM) {
+					mask =
+							_mm_load_si128(
+									(__m128i *) (MASK_SSE_END
+											+ (length % SSE_BASE_NUM) / 2
+													* SSE_BYTE_NUM));
+					printf("Mask: \n");
+					print128_bit(mask);
+					temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
+				}
+			}
 
 			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 		}
