@@ -283,7 +283,7 @@ int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 
 				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
 			}
-			if ()
+//			if ()
 
 			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 
@@ -300,7 +300,7 @@ int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 //				print128_bit(mask);
 				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
 			}
-			if ()
+//			if ()
 
 			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 		}
