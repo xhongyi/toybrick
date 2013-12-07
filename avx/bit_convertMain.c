@@ -10,16 +10,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define OPT_COUNT 3
+#define OPT_COUNT 4
 
-char* functions[OPT_COUNT] = { "verify", "serial", "sse3" };
+char* functions[OPT_COUNT] = { "verify", "serial", "sse3_11", "sse3_1" };
 
-#define _MAX_LENGTH_ 320
+#define _MAX_LENGTH_ 128
 
 char read_t[_MAX_LENGTH_] __aligned__;
 
 uint8_t read_bit_t[_MAX_LENGTH_ / 4] __aligned__;
 uint8_t ref_bit_t[_MAX_LENGTH_ / 4] __aligned__;
+uint8_t read_bit0_t[_MAX_LENGTH_ / 8] __aligned__;
+uint8_t read_bit1_t[_MAX_LENGTH_ / 8] __aligned__;
+uint8_t ref_bit0_t[_MAX_LENGTH_ / 8] __aligned__;
+uint8_t ref_bit1_t[_MAX_LENGTH_ / 8] __aligned__;
 
 void help(const char* progname) {
 	int i;
@@ -33,8 +37,8 @@ void help(const char* progname) {
 	exit(1);
 }
 
-char verify(int index, void (*func)(char*, int, uint8_t*), char *str, int length,
-		uint8_t* bits, uint8_t* bits_ref) {
+char verify(int index, void (*func)(char*, int, uint8_t*), char *str,
+		int length, uint8_t* bits, uint8_t* bits_ref) {
 	char failed = 0;
 	(*func)(str, length, bits);
 	int i;
@@ -48,6 +52,54 @@ char verify(int index, void (*func)(char*, int, uint8_t*), char *str, int length
 		int j;
 		for (j = sizeof(bits[0]) * 8 - 1; j >= 0; j--) {
 			if (bits[i] & 1ULL << j)
+				printf("1");
+			else
+				printf("0");
+		}
+	}
+
+	printf("\n");
+
+	if (failed)
+		printf("***FAILED!!!***\n");
+
+	return failed;
+}
+
+char verify(int index, void (*func)(char*, int, uint8_t*, uint8_t*), char *str,
+		int length, uint8_t* bits0, uint8_t* bits1, uint8_t* bits_ref) {
+	char failed = 0;
+	(*func)(str, length, bits0, bits1);
+	int i;
+
+	printf("%10s -> ", functions[index]);
+
+	printf("bit0: ");
+
+	for (i = 0; i <= (length - 1) * 2 / (sizeof(bits_ref[0]) * 8); i++) {
+		if (i % 2 == 0) {
+			if (bits0[i / 2] != bits_ref[i])
+				failed = 1;
+		} else {
+			if (bits1[i / 2] != bits_ref[i])
+				failed = 1;
+		}
+
+		int j;
+		for (j = sizeof(bits0[0]) * 8 - 1; j >= 0; j--) {
+			if (bits0[i] & 1ULL << j)
+				printf("1");
+			else
+				printf("0");
+		}
+	}
+
+	printf("\nbit0: ");
+
+	for (i = 0; i <= length / sizeof(bits_ref[0]); i++) {
+		int j;
+		for (j = sizeof(bits0[0]) * 8 - 1; j >= 0; j--) {
+			if (bits1[i] & 1ULL << j)
 				printf("1");
 			else
 				printf("0");
@@ -123,7 +175,7 @@ int main(int argc, char* argv[]) {
 //	}
 
 	strcpy(read_t,
-			"ACGCTAGTAGCCGGAATAACAGGTAGGCCTACATTTTCTATACGGCGCCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
+			"ACGCTAGTAGCCGGAATAACAGGTAGGCCTACATTTTCTATACGGCGCCGGCAA");
 
 	printf("Data: ");
 	for (i = 0; i < length_count; i++)
@@ -144,7 +196,8 @@ int main(int argc, char* argv[]) {
 
 		// serial is reference reference
 		printf("%10s -> ", functions[1]);
-		for (i = 0; i <= (length_count - 1) * 2 / (sizeof(ref_bit_t[0]) * 8); i++) {
+		for (i = 0; i <= (length_count - 1) * 2 / (sizeof(ref_bit_t[0]) * 8);
+				i++) {
 			int j;
 			for (j = sizeof(ref_bit_t[0]) * 8 - 1; j >= 0; j--) {
 				if (ref_bit_t[i] & 1ULL << j)
@@ -155,12 +208,15 @@ int main(int argc, char* argv[]) {
 		}
 		printf("\n");
 
-		for (i = 0; i <= (length_count - 1) * 2 / (sizeof(ref_bit_t[0]) * 8); i++)
-			printf ("%2x", ref_bit_t[i]);
+		for (i = 0; i <= (length_count - 1) * 2 / (sizeof(ref_bit_t[0]) * 8);
+				i++)
+			printf("%2x", ref_bit_t[i]);
 		printf("\n");
 
-		failed |= verify(2, &sse3_convert2bit, read_t, length_count,
+		failed |= verify(2, &sse3_convert2bit11, read_t, length_count,
 				read_bit_t, ref_bit_t);
+		failed |= verify(2, &sse3_convert2bit1, read_t, length_count,
+				read_bit0_t, read_bit1_t, ref_bit_t);
 
 		if (failed)
 			return EXIT_FAILURE;
@@ -168,13 +224,18 @@ int main(int argc, char* argv[]) {
 		break;
 
 	case 1:
-		while(repeat_count--)
+		while (repeat_count--)
 			c_convert2bit(read_t, length_count, read_bit_t);
 		break;
 
 	case 2:
-		while(repeat_count--)
-			sse3_convert2bit(read_t, length_count, read_bit_t);
+		while (repeat_count--)
+			sse3_convert2bit11(read_t, length_count, read_bit_t);
+		break;
+
+	case 3:
+		while (repeat_count--)
+			sse3_convert2bit1(read_t, length_count, read_bit0_t, read_bit1_t);
 		break;
 
 	}
@@ -187,5 +248,4 @@ int main(int argc, char* argv[]) {
 }
 
 // eof
-
 

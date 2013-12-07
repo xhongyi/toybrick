@@ -16,6 +16,8 @@
 
 void c_convert2bit(char *str, int length, uint8_t *bits);
 
-void sse3_convert2bit(char *str, int length, uint8_t *bits);
+void sse3_convert2bit11(char *str, int length, uint8_t *bits);
+
+void sse3_convert2bit1(char *str, int length, uint8_t *bits0, uint8_t *bits1);
 
 #endif /* BIT_CONVERT_H_ */
