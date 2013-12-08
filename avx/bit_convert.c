@@ -202,22 +202,25 @@ uint8_t BIT_00[16] __aligned__ = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 uint8_t BIT_FF[16] __aligned__ = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
-uint8_t BASE_SHIFT1[16] __aligned__ = { 0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe,
-		0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf };
+uint8_t BASE_SHIFT1[16] __aligned__ = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13,
+		3, 11, 7, 15 };
+
+uint8_t BASE_SHIFT2[16] __aligned__ = { 0, 1, 8, 9, 4, 5, 12, 13, 2, 3, 10, 11,
+		6, 7, 14, 15 };
 
 //Have to consider Intel's endians
 uint8_t LOC_MASK1[128] = { 0x01, 0x01, 0x01, 0x01, //1
 		0x01, 0x01, 0x01, 0x01, //1
 		0x01, 0x01, 0x01, 0x01, //1
 		0x01, 0x01, 0x01, 0x01, //1
-		0x02, 0x02, 0x02, 0x02, //2
-		0x02, 0x02, 0x02, 0x02, //2
-		0x02, 0x02, 0x02, 0x02, //2
-		0x02, 0x02, 0x02, 0x02, //2
 		0x04, 0x04, 0x04, 0x04, //3
 		0x04, 0x04, 0x04, 0x04, //3
 		0x04, 0x04, 0x04, 0x04, //3
 		0x04, 0x04, 0x04, 0x04, //3
+		0x02, 0x02, 0x02, 0x02, //2
+		0x02, 0x02, 0x02, 0x02, //2
+		0x02, 0x02, 0x02, 0x02, //2
+		0x02, 0x02, 0x02, 0x02, //2
 		0x08, 0x08, 0x08, 0x08, //4
 		0x08, 0x08, 0x08, 0x08, //4
 		0x08, 0x08, 0x08, 0x08, //4
@@ -226,14 +229,14 @@ uint8_t LOC_MASK1[128] = { 0x01, 0x01, 0x01, 0x01, //1
 		0x10, 0x10, 0x10, 0x10, //5
 		0x10, 0x10, 0x10, 0x10, //5
 		0x10, 0x10, 0x10, 0x10, //5
-		0x20, 0x20, 0x20, 0x20, //6
-		0x20, 0x20, 0x20, 0x20, //6
-		0x20, 0x20, 0x20, 0x20, //6
-		0x20, 0x20, 0x20, 0x20, //6
 		0x40, 0x40, 0x40, 0x40, //7
 		0x40, 0x40, 0x40, 0x40, //7
 		0x40, 0x40, 0x40, 0x40, //7
 		0x40, 0x40, 0x40, 0x40, //7
+		0x20, 0x20, 0x20, 0x20, //6
+		0x20, 0x20, 0x20, 0x20, //6
+		0x20, 0x20, 0x20, 0x20, //6
+		0x20, 0x20, 0x20, 0x20, //6
 		0x80, 0x80, 0x80, 0x80, //8
 		0x80, 0x80, 0x80, 0x80, //8
 		0x80, 0x80, 0x80, 0x80, //8
@@ -266,7 +269,7 @@ void sse3_convert2bit1(char *str, uint8_t *bits0, uint8_t *bits1) {
 		*cast_str = _mm_shuffle_epi8(*cast_str, *shift_hint);
 	}
 
-	printf("After shifting 0: %s\n", str);
+//	printf("After shifting 0: %s\n", str);
 
 	for (i = 8; i < 128; i += 32) {
 		cast_str = (__m128i *) (str + i);
@@ -275,7 +278,15 @@ void sse3_convert2bit1(char *str, uint8_t *bits0, uint8_t *bits1) {
 		_mm_storeu_si128(cast_str, temp);
 	}
 
-	printf("After shifting 1: %s\n", str);
+//	printf("After shifting 1: %s\n", str);
+
+	shift_hint = (__m128i *) BASE_SHIFT2;
+	for (i = 0; i < 128; i += 16) {
+		cast_str = (__m128i *) (str + i);
+		*cast_str = _mm_shuffle_epi8(*cast_str, *shift_hint);
+	}
+
+//	printf("After shifting 2: %s\n", str);
 
 	for (i = 16; i < 128; i += 64) {
 		temp = *((__m128i *) (str + i));
@@ -283,7 +294,7 @@ void sse3_convert2bit1(char *str, uint8_t *bits0, uint8_t *bits1) {
 		*((__m128i *) (str + i + 16)) = temp;
 	}
 
-	printf("After shifting 2: %s\n", str);
+//	printf("After shifting 3: %s\n", str);
 
 	for (i = 8; i < 128; i += 32) {
 		cast_str = (__m128i *) (str + i);
@@ -292,7 +303,7 @@ void sse3_convert2bit1(char *str, uint8_t *bits0, uint8_t *bits1) {
 		_mm_storeu_si128(cast_str, temp);
 	}
 
-	printf("After shifting 3: %s\n", str);
+//	printf("After shifting 4: %s\n", str);
 
 	for (i = 0; i < 128; i += 16) {
 		cast_str = (__m128i *) (str + i);
@@ -301,15 +312,15 @@ void sse3_convert2bit1(char *str, uint8_t *bits0, uint8_t *bits1) {
 		_mm_store_si128(cast_str, temp);
 	}
 
-	printf("After shifting 4: %s\n", str);
+//	printf("After shifting 5: %s\n", str);
 
 	for (i = 16; i < 64; i += 32) {
 		temp = *((__m128i *) (str + i));
-		*((__m128i *) (str + i)) = *((__m128i *) (str + i + 64));
-		*((__m128i *) (str + i + 64)) = temp;
+		*((__m128i *) (str + i)) = *((__m128i *) (str + i + 48));
+		*((__m128i *) (str + i + 48)) = temp;
 	}
 
-	printf("After shifting 5: %s\n", str);
+//	printf("After shifting 6: %s\n", str);
 
 	for (i = 8; i < 128; i += 32) {
 		cast_str = (__m128i *) (str + i);
@@ -318,7 +329,7 @@ void sse3_convert2bit1(char *str, uint8_t *bits0, uint8_t *bits1) {
 		_mm_storeu_si128(cast_str, temp);
 	}
 
-	printf("After shifting 6: %s\n", str);
+//	printf("After shifting 7: %s\n", str);
 
 	result0 = _mm_set1_epi32(0);
 	result1 = _mm_set1_epi32(0);
@@ -332,19 +343,17 @@ void sse3_convert2bit1(char *str, uint8_t *bits0, uint8_t *bits1) {
 		cast_str = (__m128i *) (str + i);
 		temp = _mm_cmpeq_epi8(*maskC, *cast_str);
 		result0 = _mm_and_si128(temp, *((__m128i *) BIT_FF)); //C=01
-		result1 = _mm_and_si128(temp, *((__m128i *) BIT_00));
 		//print128_hex(result);
 
 		temp = _mm_cmpeq_epi8(*maskG, *cast_str);
-		temp = _mm_and_si128(temp, *((__m128i *) BIT_G_16));
-		result0 = _mm_and_si128(temp, *((__m128i *) BIT_00)); //G=10
-		result1 = _mm_and_si128(temp, *((__m128i *) BIT_FF));
+		temp = _mm_and_si128(temp, *((__m128i *) BIT_FF));
+		result1 = _mm_or_si128(result1, temp); //G=10
 		//print128_hex(result);
 
 		temp = _mm_cmpeq_epi8(*maskT, *cast_str);
-		temp = _mm_and_si128(temp, *((__m128i *) BIT_T_16));
-		result0 = _mm_and_si128(temp, *((__m128i *) BIT_FF)); //T=11
-		result1 = _mm_and_si128(temp, *((__m128i *) BIT_FF));
+		temp = _mm_and_si128(temp, *((__m128i *) BIT_FF)); //T=11
+		result0 = _mm_or_si128(result0, temp); //T=11
+		result1 = _mm_or_si128(result1, temp); //T=11
 		//print128_hex(result);
 
 		mask = (__m128i *) (LOC_MASK1 + i);
@@ -355,8 +364,8 @@ void sse3_convert2bit1(char *str, uint8_t *bits0, uint8_t *bits1) {
 		*bit0_reg = _mm_or_si128(*bit0_reg, result0);
 		*bit1_reg = _mm_or_si128(*bit1_reg, result1);
 		//print128_bit(result);
-		print128_bit(*bit0_reg);
-		print128_bit(*bit1_reg);
+//		print128_bit(*bit0_reg);
+//		print128_bit(*bit1_reg);
 
 	}
 }

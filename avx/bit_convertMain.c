@@ -73,37 +73,81 @@ char verify(int index, void (*func)(char*, uint8_t*, uint8_t*), char *str,
 	(*func)(str, bits0, bits1);
 	int i;
 
+	uint8_t bit;
+
 	printf("%10s -> ", functions[index]);
 
 	for (i = 0; i <= (length - 1) * 2 / (sizeof(bits_ref[0]) * 8); i++) {
+		bit = 0;
+
 		if (i % 2 == 0) {
-			if (bits0[i / 2] != bits_ref[i])
-				failed = 1;
+			for (int j = 0; j < 4; j++) {
+				bit |= (bits0[i / 2] & (1 << j)) << j;
+				bit |= (bits1[i / 2] & (1 << j)) << (j + 1);
+			}
 		} else {
-			if (bits1[i / 2] != bits_ref[i])
-				failed = 1;
+			for (int j = 0; j < 4; j++) {
+				bit |= (bits0[i / 2] & (1 << (j + 4))) >> 4 << j;
+				bit |= (bits1[i / 2] & (1 << (j + 4))) >> 4 << (j + 1);
+			}
 		}
+
+//		printf("bit: %x, bits_ref[%d]: %x\n", bit, i, bits_ref[i]);
+
+		if (bit != bits_ref[i])
+			failed = 1;
 
 	}
 
-	printf("\nbit0: ");
+//	printf("\nbit0: ");
+//
+//	for (i = 0; i < length / (sizeof(bits0[0]) * 8); i++) {
+//		int j;
+//		for (j = sizeof(bits0[0]) * 8 - 1; j >= 0; j--) {
+//			if (bits0[i] & 1ULL << j)
+//				printf("1");
+//			else
+//				printf("0");
+//		}
+//	}
+//
+//	printf("\nbit1: ");
+//
+//	for (i = 0; i < length / (sizeof(bits1[0]) * 8); i++) {
+//		int j;
+//		for (j = sizeof(bits1[0]) * 8 - 1; j >= 0; j--) {
+//			if (bits1[i] & 1ULL << j)
+//				printf("1");
+//			else
+//				printf("0");
+//		}
+//	}
 
-	for (i = 0; i < length / (sizeof(bits0[0]) * 8); i++) {
+//	printf("\nmerged together: ");
+
+	for (i = 0; i < (length - 1) / (sizeof(bits1[0]) * 8) + 1; i++) {
 		int j;
-		for (j = sizeof(bits0[0]) * 8 - 1; j >= 0; j--) {
+		for (j = 3; j >= 0; j--) {
+
+			if (bits1[i] & 1ULL << j)
+				printf("1");
+			else
+				printf("0");
+
 			if (bits0[i] & 1ULL << j)
 				printf("1");
 			else
 				printf("0");
 		}
-	}
 
-	printf("\nbit1: ");
+		for (j = 7; j >= 4; j--) {
 
-	for (i = 0; i < length / (sizeof(bits1[0]) * 8); i++) {
-		int j;
-		for (j = sizeof(bits1[0]) * 8 - 1; j >= 0; j--) {
 			if (bits1[i] & 1ULL << j)
+				printf("1");
+			else
+				printf("0");
+
+			if (bits0[i] & 1ULL << j)
 				printf("1");
 			else
 				printf("0");
@@ -212,25 +256,24 @@ int main(int argc, char* argv[]) {
 		}
 		printf("\n");
 
-		for (i = 0; i <= (length_count - 1) * 2 / (sizeof(ref_bit_t[0]) * 8);
-				i++)
-			printf("%2x", ref_bit_t[i]);
-		printf("\n");
+//		for (i = 0; i <= (length_count - 1) * 2 / (sizeof(ref_bit_t[0]) * 8);
+//				i++)
+//			printf("%2x", ref_bit_t[i]);
+//		printf("\n");
 
-		printf("Before swapping: %s\n", read_t);
+//		printf("Before swapping: %s\n", read_t);
 
 		strcpy(read_t,
-					"ACGCTAGTAGCCGGAATAACAGGTAGGCCTACATTTTCTATACGGCGCCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
+				"ACGCTAGTAGCCGGAATAACAGGTAGGCCTACATTTTCTATACGGCGCCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
 		failed |= verify(2, &sse3_convert2bit11, read_t, length_count,
 				read_bit_t, ref_bit_t);
-		printf("After swapping: %s\n", read_t);
+//		printf("After swapping: %s\n", read_t);
 
 		strcpy(read_t,
-					"ACGCTAGTAGCCGGAATAACAGGTAGGCCTACATTTTCTATACGGCGCCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
+				"ACGCTAGTAGCCGGAATAACAGGTAGGCCTACATTTTCTATACGGCGCCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
 		failed |= verify(3, &sse3_convert2bit1, read_t, length_count,
 				read_bit0_t, read_bit1_t, ref_bit_t);
-		printf("After swapping: %s\n", read_t);
-
+//		printf("After swapping: %s\n", read_t);
 
 		if (failed)
 			return EXIT_FAILURE;
