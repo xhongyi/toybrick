@@ -137,6 +137,7 @@ uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
 	// xmm4 -- local accumulator
 
 	__asm__ volatile(
+			"movdqa        %1, %%xmm0	\n"
 			"movdqa    %%xmm0, %%xmm1	\n"
 
 			"psrlw         $4, %%xmm1	\n"
