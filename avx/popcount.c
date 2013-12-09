@@ -157,7 +157,7 @@ uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
 			"paddd     %%xmm4, %%xmm0	\n"
 			"movd   %%xmm0, %%eax		\n"
 			: "=a" (result)
-			: "x0" (reg)
+			: "x" (reg)
 	);
 
 	return result;
