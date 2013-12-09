@@ -335,8 +335,8 @@ int bit_vec_filter_sse(char* read, char* ref, int length, int max_error) {
 //	memcpy(read_t, read, length * sizeof(char));
 //	memcpy(ref_t, ref, length * sizeof(char));
 
-	sse3_convert2bit(read, length, read_bit_t);
-	sse3_convert2bit(ref, length, ref_bit_t);
+	sse3_convert2bit11(read, length, read_bit_t);
+	sse3_convert2bit11(ref, length, ref_bit_t);
 
 	return bit_vec_filter_m128_sse(read_bit_t, ref_bit_t, length, max_error);
 }
@@ -347,8 +347,8 @@ void bit_vec_filter_sse_simulate(char* read, char* ref, int length,
 //	memcpy(read_t, read, length * sizeof(char));
 //	memcpy(ref_t, ref, length * sizeof(char));
 
-	sse3_convert2bit(read, length, read_bit_t);
-	sse3_convert2bit(ref, length, ref_bit_t);
+	sse3_convert2bit11(read, length, read_bit_t);
+	sse3_convert2bit11(ref, length, ref_bit_t);
 
 	while (loc_num--)
 		bit_vec_filter_m128_sse(read_bit_t, ref_bit_t, length, max_error);

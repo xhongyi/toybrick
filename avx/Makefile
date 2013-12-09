@@ -33,7 +33,7 @@ mask.o: mask.c mask.h
 vector_filter: mask.o print.o bit_convert.o popcount.o vector_filter.o vector_filterMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
-shift: print.o vector_filter.o popcount.o bit_convert.o shiftMain.c
+shift: mask.o print.o vector_filter.o popcount.o bit_convert.o shiftMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
 timeSSE: timeSSE.c
