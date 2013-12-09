@@ -2,7 +2,7 @@
 
 #ifndef BOOST_PP_IS_ITERATING
 
-uint8_t *MASK_SSE_END = (uint8_t [SSE_BIT_LENGTH * SSE_BYTE_NUM / BASE_SIZE]) {
+uint8_t __MASK_SSE_END_ [SSE_BIT_LENGTH * SSE_BYTE_NUM / BASE_SIZE] = {
 
 #define BOOST_PP_ITERATION_LIMITS	(0, SSE_BIT_LENGTH / 2  - 1)
 #define BOOST_PP_FILENAME_1			"mask.c" // this file
@@ -50,5 +50,8 @@ uint8_t *MASK_SSE_END = (uint8_t [SSE_BIT_LENGTH * SSE_BYTE_NUM / BASE_SIZE]) {
 #endif // BOOST_PP_IS_ITERATING
 #ifndef BOOST_PP_IS_ITERATING
 };
+
+uint8_t* MASK_SSE_END = __MASK_SSE_END_;
+
 #endif // BOOST_PP_IS_ITERATING
 

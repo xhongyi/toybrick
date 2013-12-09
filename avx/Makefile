@@ -1,10 +1,17 @@
-EXECUTABLE = popcount bit_convert vector_filter string_cp ssse3_popcount shift
+EXECUTABLE = popcount bit_convert vector_filter string_cp shift #ssse3_popcount
 
 CXX = g++
 
 CC = g++
 
-CFLAGS = -O3 -march=native -I . -I/opt/local/include
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	CFLAGS = -O3 -march=native -I .
+endif
+ifeq ($(UNAME_S),Darwin)
+	CFLAGS = -O3 -march=native -I . -I/opt/local/include
+endif
+
 #CFLAGS = -O3 -march=native -P -E
 
 all: $(EXECUTABLE)
@@ -42,8 +49,8 @@ timeSSE: timeSSE.c
 string_cp: print.o string_cp.c
 	$(CXX) $(CFLAGS) $^ -o $@
 	
-ssse3_popcount: ssse3_popcount.c
-	$(CXX) $(CFLAGS) $< -o $@
+#ssse3_popcount: ssse3_popcount.c
+#	$(CXX) $(CFLAGS) $< -o $@
 	
 
 	
