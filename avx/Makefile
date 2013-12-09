@@ -4,12 +4,13 @@ CXX = g++
 
 CC = g++
 
+CFLAGS = -g -march=native -I .
+
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-	CFLAGS = -O3 -march=native -I .
 endif
 ifeq ($(UNAME_S),Darwin)
-	CFLAGS = -O3 -march=native -I . -I/opt/local/include
+	CFLAGS += -I/opt/local/include -fasm-blocks
 endif
 
 #CFLAGS = -O3 -march=native -P -E

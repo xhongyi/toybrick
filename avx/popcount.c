@@ -54,8 +54,8 @@ uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
 
 	uint32_t result;
 
-	__asm__ volatile ("movdqu (%%eax), %%xmm7" : : "a" (map));
-	__asm__ volatile ("movdqu (%%eax), %%xmm6" : : "a" (MASK_4bit));
+	__asm__ volatile ("movdqu (%%rax), %%xmm7" : : "a" (map));
+	__asm__ volatile ("movdqu (%%rax), %%xmm6" : : "a" (MASK_4bit));
 	__asm__ volatile ("pxor    %%xmm5, %%xmm5" : : );
 	// xmm5 -- global accumulator
 
@@ -81,7 +81,7 @@ uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
 		// xmm4 -- local accumulator
 		for (n = 0; n < k; n++) {
 			__asm__ volatile(
-					"movdqa	  (%%eax), %%xmm0	\n"
+					"movdqa	  (%%rax), %%xmm0	\n"
 					"movdqa    %%xmm0, %%xmm1	\n"
 
 					"psrlw         $4, %%xmm1	\n"
@@ -114,7 +114,7 @@ uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
 	__asm__ volatile (
 			"movhlps   %%xmm5, %%xmm0	\n"
 			"paddd     %%xmm5, %%xmm0	\n"
-			"movd      %%xmm0, %%eax	\n"
+			"movd      %%xmm0, %%rax	\n"
 			: "=a" (result)
 	);
 
@@ -127,8 +127,8 @@ uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
 
 	uint32_t result;
 
-	__asm__ volatile ("movdqu (%%eax), %%xmm7" : : "a" (map));
-	__asm__ volatile ("movdqu (%%eax), %%xmm6" : : "a" (MASK_4bit));
+	__asm__ volatile ("movdqu (%%rax), %%xmm7" : : "a" (map));
+	__asm__ volatile ("movdqu (%%rax), %%xmm6" : : "a" (MASK_4bit));
 	// xmm5 -- global accumulator
 
 	result = 0;
@@ -156,7 +156,7 @@ uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
 			"psadbw	%%xmm0, %%xmm4		\n"
 			"movhlps   %%xmm4, %%xmm0	\n"
 			"paddd     %%xmm4, %%xmm0	\n"
-			"movd   %%xmm0, %%eax		\n"
+			"movd   %%xmm0, %%rax		\n"
 			: "=a" (result)
 			: "x" (reg)
 	);
