@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 
 	switch (function) {
 	case 0:
-		popcount_ref = popcount(buffer, chunks_count);
+		popcount_ref = popcount1(buffer, chunks_count);
 		popcount_ref11 = popcount11(buffer, chunks_count);
 
 		// lookup result is reference
@@ -136,10 +136,10 @@ int main(int argc, char* argv[]) {
 
 		failed |= verify(3, &builtin_popcount, buffer, chunks_count,
 				popcount_ref);
-		failed |= verify(4, &popcount_sse, buffer, chunks_count, popcount_ref);
+		failed |= verify(4, &popcount1_sse, buffer, chunks_count, popcount_ref);
 		failed |= verify(5, &popcount11_sse, buffer, chunks_count,
 				popcount_ref11);
-		failed |= verify_m128i(6, &popcount_m128i_sse, buffer, chunks_count,
+		failed |= verify_m128i(6, &popcount1_m128i_sse, buffer, chunks_count,
 				popcount_ref);
 		failed |= verify_m128i(7, &popcount11_m128i_sse, buffer, chunks_count,
 				popcount_ref11);
@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
 
 	case 1:
 		while (repeat_count--)
-			popcount(buffer, chunks_count);
+			popcount1(buffer, chunks_count);
 		break;
 
 	case 2:
@@ -166,7 +166,7 @@ int main(int argc, char* argv[]) {
 
 	case 4:
 		while (repeat_count--)
-			popcount_sse(buffer, chunks_count);
+			popcount1_sse(buffer, chunks_count);
 		break;
 
 	case 5:
@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
 			result = 0;
 			for (i = 0; i < chunks_count; i++) {
 				__m128i reg = *((__m128i *) (buffer + i * 16));
-				result += popcount_m128i_sse(reg);
+				result += popcount1_m128i_sse(reg);
 			}
 		}
 		break;

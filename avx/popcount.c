@@ -164,7 +164,7 @@ uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
 	return result;
 }
 
-uint32_t popcount_m128i_sse(__m128i reg) {
+uint32_t popcount1_m128i_sse(__m128i reg) {
 	return ssse3_popcount_m128_core(reg, POPCOUNT_4bit);
 }
 
@@ -172,7 +172,7 @@ uint32_t popcount11_m128i_sse(__m128i reg) {
 	return ssse3_popcount_m128_core(reg, POPCOUNT_4bit11);
 }
 
-uint32_t popcount_sse(uint8_t* buffer, int chunks16) {
+uint32_t popcount1_sse(uint8_t* buffer, int chunks16) {
 	return ssse3_popcount_core(buffer, chunks16, POPCOUNT_4bit);
 }
 
@@ -194,7 +194,7 @@ uint32_t builtin_popcount(uint8_t* buffer, int chunks16) {
 	return result;
 }
 
-uint32_t popcount(uint8_t *buffer, int chunks16) {
+uint32_t popcount1(uint8_t *buffer, int chunks16) {
 	uint32_t result = 0;
 
 	int i;

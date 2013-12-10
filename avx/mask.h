@@ -13,7 +13,8 @@
 #define BYTE_BASE_NUM		BOOST_PP_DIV(8, BASE_SIZE)
 #define SSE_BYTE_NUM		BOOST_PP_DIV(SSE_BIT_LENGTH, 8)
 
-extern uint8_t *MASK_SSE_END;
+extern uint8_t *MASK_SSE_END1;
+extern uint8_t *MASK_SSE_END11;
 
 /*
 = {

@@ -259,7 +259,7 @@ int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 //			printf("WTF\n");
 			if (length % SSE_BASE_NUM) {
 				mask = _mm_load_si128(
-						(__m128i *) (MASK_SSE_END
+						(__m128i *) (MASK_SSE_END1
 								+ (length % SSE_BASE_NUM) * SSE_BYTE_NUM));
 //				printf("Mask: \n");
 //				print128_bit(mask);
@@ -282,7 +282,7 @@ int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 			if (i + SSE_BYTE_NUM >= total_byte) {
 				if (length % SSE_BASE_NUM) {
 					mask = _mm_load_si128(
-							(__m128i *) (MASK_SSE_END
+							(__m128i *) (MASK_SSE_END1
 									+ (length % SSE_BASE_NUM) * SSE_BYTE_NUM));
 					temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
 				}
@@ -307,7 +307,7 @@ int bit_vec_filter_m128_sse(uint8_t *read_vec, uint8_t *ref_vec, int length,
 //				printf("WTF\n");
 				if (length % SSE_BASE_NUM) {
 					mask = _mm_load_si128(
-							(__m128i *) (MASK_SSE_END
+							(__m128i *) (MASK_SSE_END1
 									+ (length % SSE_BASE_NUM) * SSE_BYTE_NUM));
 //					printf("Mask: \n");
 //					print128_bit(mask);
