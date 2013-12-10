@@ -6,6 +6,7 @@
  */
 
 #include "vector_filter.h"
+#include "mask.h"
 #include <stdio.h>
 
 uint8_t buff[32] __aligned__;
@@ -33,6 +34,10 @@ int main(int argc, char* argv[]) {
 
 	printf("length=%d, repeat count=%llu\n", length, repeat_count);
 
+	printf("MASK_SSE_END:\n");
+	for (i = 0; i < 128 * 16; i++)
+		printf("%x, ", MASK_SSE_END1[i]);
+
 //	printf("Data: ");
 //	printbytevector(buff, 32);
 //	printf("\n");
@@ -47,7 +52,7 @@ int main(int argc, char* argv[]) {
 
 //	*curr = shift_right_sse(*prev, *curr, 1);
 	while (repeat_count--)
-		shift_left_sse(*prev, *curr, shift_num);
+		shift_left_sse11(*prev, *curr, shift_num);
 
 //	*curr = _mm_slli_epi16(*curr, 2);
 
