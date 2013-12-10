@@ -121,8 +121,8 @@ int main(int argc, char* argv[]) {
 //		printf("\n");
 
 //	while (repeat_count--)
-//		bit_vec_filter_sse_simulate(read_t, ref_t, length, error, average_loc);
-	if (bit_vec_filter_sse(read_t, ref_t, length, error))
+//		bit_vec_filter_sse_simulate11(read_t, ref_t, length, error, average_loc);
+	if (bit_vec_filter_sse11(read_t, ref_t, length, error))
 		printf("Pass Filter\n");
 	else
 		printf("Fail Filter\n");
