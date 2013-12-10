@@ -10,7 +10,7 @@ uint8_t __MASK_SSE_END1_ [SSE_BIT_LENGTH * SSE_BYTE_NUM / BASE_SIZE1] = {
 
 #define BOOST_PP_ITERATION_LIMITS	(0, SSE_BIT_LENGTH - 1)
 #define BOOST_PP_FILENAME_1			"1masks.hpp" // this file
-??=include BOOST_PP_ITERATE()
+#include BOOST_PP_ITERATE()
 
 };
 
@@ -25,7 +25,7 @@ uint8_t __MASK_SSE_END11_ [SSE_BIT_LENGTH * SSE_BYTE_NUM / BASE_SIZE11] = {
 
 #define BOOST_PP_ITERATION_LIMITS	(0, SSE_BIT_LENGTH / 2  - 1)
 #define BOOST_PP_FILENAME_1			"11masks.hpp" // this file
-??=include BOOST_PP_ITERATE()
+#include BOOST_PP_ITERATE()
 
 };
 
