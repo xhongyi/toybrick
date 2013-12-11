@@ -107,10 +107,10 @@ int main(int argc, char* argv[]) {
 	if (argc >= 5)
 		average_loc = atoi(argv[4]);
 
-//	for (int i = 0; i < SSE_BIT_LENGTH * SSE_BYTE_NUM / BASE_SIZE; i++) {
+//	for (int i = 0; i < SSE_BIT_LENGTH * SSE_BYTE_NUM / BASE_SIZE1; i++) {
 //		if (i % SSE_BYTE_NUM == 0)
 //			printf("\n");
-//		printf("%x ", MASK_SSE_END[i]);
+//		printf("%x ", MASK_SSE_END1[i]);
 //	}
 
 //	if (read_t[repeat_count] = 'A')
@@ -122,10 +122,22 @@ int main(int argc, char* argv[]) {
 
 //	while (repeat_count--)
 //		bit_vec_filter_sse_simulate11(read_t, ref_t, length, error, average_loc);
-	if (bit_vec_filter_sse11(read_t, ref_t, length, error))
-		printf("Pass Filter\n");
-	else
-		printf("Fail Filter\n");
+	while (repeat_count--)
+		bit_vec_filter_sse_simulate1(read_t, ref_t, length, error, average_loc);
+//	if (bit_vec_filter_sse11(read_t, ref_t, length, error))
+//		printf("Pass Filter\n");
+//	else
+//		printf("Fail Filter\n");
+//
+//	strcpy(read_t,
+//			"TCGCTAGTAGCCGGAACTAACAGGTAGGCCTACATCAGCTATACGGCATCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
+//	strcpy(ref_t,
+//			"TCGCTAGTAGCCGGAATAACAGGTAGGCCTACATCTGCTATACGGCACGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGGAA");
+//
+//	if (bit_vec_filter_sse1(read_t, ref_t, length, error))
+//		printf("Pass Filter\n");
+//	else
+//		printf("Fail Filter\n");
 
 	return 0;
 
