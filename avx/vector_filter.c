@@ -223,94 +223,64 @@ __m128i xor11complement_sse(__m128i input) {
 }
 
 int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
-				*ref_vec0, uint8_t *ref_vec1, int length, int max_error) {
+				*ref_vec0, uint8_t *ref_vec1, __m128i mask, int max_error) {
 
 	int total_difference = 0;
 
 	//Start iteration
 	int j;
 	//read data
-	__m128i read_XMM0 = *((__m128i *) (read_));
+	__m128i read_XMM0 = *((__m128i *) (read_vec0));
+	__m128i read_XMM1 = *((__m128i *) (read_vec1));
 	//ref data
-	__m128i ref_XMM = *((__m128i *) (ref_bit_t));
+	__m128i ref_XMM0 = *((__m128i *) (ref_vec0));
+	__m128i ref_XMM1 = *((__m128i *) (ref_vec1));
 
 	__m128i shift_XMM;
-	__m128i temp_diff_XMM;
 	__m128i diff_XMM;
-	__m128i mask;
+	__m128i temp_diff_XMM;
+	__m128i temp_shift_XMM;
+	__m128i temp_mask;
 
-		diff_XMM = _mm_xor_si128(read_XMM, ref_XMM);
+	diff_XMM = _mm_xor_si128(read_XMM0, ref_XMM0);
+	temp_diff_XMM = _mm_xor_si128(read_XMM1, ref_XMM1);
+	diff_XMM = _mm_or_si128(diff_XMM, temp_diff_XMM);
 
-		for (j = 1; j <= max_error; j++) {
-			//Right shift read
-			shift_XMM = shift_right_sse1(read_XMM, j);
-			temp_diff_XMM = _mm_xor_si128(read_XMM, ref_XMM);
-//			temp_diff_XMM = xor11complement_sse(temp_diff_XMM);
-//			if (i == 0) {
-////				mask = shift_right_sse11(zero_mask, one_mask, j);
-//				mask = _mm_load_si128(
-//						(__m128i *) (MASK_SSE_BEG11 + (j - 1) * SSE_BYTE_NUM));
-//
-//				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
-//			}
-//			if (i + SSE_BYTE_NUM >= total_byte) {
-//				if (length % SSE_BASE_NUM11) {
-//					mask = _mm_load_si128(
-//							(__m128i *) (MASK_SSE_END1
-//									+ (length % SSE_BASE_NUM11) * SSE_BYTE_NUM));
-//					temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
-//				}
-//			}
-//
-//			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
-//
-//			//Right shift ref
-//			ref_XMM = shift_right_sse11(prev_ref_XMM, curr_ref_XMM, j);
-//			temp_diff_XMM = _mm_xor_si128(curr_read_XMM, ref_XMM);
-//			temp_diff_XMM = xor11complement_sse(temp_diff_XMM);
-//			if (i == 0) {
-////				mask = shift_right_sse11(zero_mask, one_mask, j);
-//				mask = _mm_load_si128(
-//						(__m128i *) (MASK_SSE_BEG11 + (j - 1) * SSE_BYTE_NUM));
-//
-////				printf("Mask: \n");
-////				print128_bit(mask);
-//				temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
-//			}
-//			if (i + SSE_BYTE_NUM >= total_byte) {
-////				printf("WTF\n");
-//				if (length % SSE_BASE_NUM11) {
-//					mask = _mm_load_si128(
-//							(__m128i *) (MASK_SSE_END1
-//									+ (length % SSE_BASE_NUM11) * SSE_BYTE_NUM));
-////					printf("Mask: \n");
-////					print128_bit(mask);
-//					temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
-//				}
-//			}
-//
-//			diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
-//		}
-//
-//		total_difference += popcount11_m128i_sse(diff_XMM);
-//
-//		prev_read_XMM = curr_read_XMM;
-//		prev_ref_XMM = curr_ref_XMM;
-//
-//		if (total_difference > max_error)
-//			return 0;
-//	}
-//
-//	return 1;
-//}
+	for (j = 1; j <= max_error; j++) {
+		temp_mask = _mm_load_si128( (__m128i *) (MASK_SSE_BEG1 + (j - 1) *
+								SSE_BYTE_NUM));
+		temp_mask = _mm_and_si128(temp_mask, mask);
+
+		//Right shift read
+		shift_XMM = shift_right_sse1(read_XMM0, j);
+		temp_diff_XMM = _mm_xor_si128(shift_XMM, ref_XMM0);
+		shift_XMM = shift_right_sse1(read_XMM1, j);
+		temp_shift_XMM = _mm_xor_si128(shift_XMM, ref_XMM1);
+		temp_diff_XMM = _mm_or_si128(temp_shift_XMM, temp_diff_XMM);
+		temp_diff_XMM = _mm_and_si128(temp_shift_XMM, temp_mask);
+		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
+
+		//Right shift ref
+		shift_XMM = shift_right_sse1(ref_XMM0, j);
+		temp_diff_XMM = _mm_xor_si128(shift_XMM, read_XMM0);
+		shift_XMM = shift_right_sse1(ref_XMM1, j);
+		temp_shift_XMM = _mm_xor_si128(shift_XMM, read_XMM1);
+		temp_diff_XMM = _mm_or_si128(temp_shift_XMM, temp_diff_XMM);
+		temp_diff_XMM = _mm_and_si128(temp_shift_XMM, temp_mask);
+		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
+	}
+
+	total_difference = popcount11_m128i_sse(diff_XMM);
+
+	if (total_difference > max_error)
+		return 0;
+	else
+		return 1;
+}
 
 //__m128i one_mask = _mm_set1_epi8(0xff);
 //__m128i zero_mask = _mm_set1_epi8(0x00);
 
-#define _MAX_LENGTH_ 320
-
-uint8_t read_bit_t[_MAX_LENGTH_ / 4 + 16] __aligned__;
-uint8_t ref_bit_t[_MAX_LENGTH_ / 4 + 16] __aligned__;
 
 int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,
 		int max_error) {
@@ -325,10 +295,10 @@ int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,
 	int i, j;
 	//read data
 	__m128i prev_read_XMM = _mm_set1_epi8(0x0);
-	__m128i curr_read_XMM = *((__m128i *) (read_bit_t));
+	__m128i curr_read_XMM = *((__m128i *) (read_vec));
 	//ref data
 	__m128i prev_ref_XMM = _mm_set1_epi8(0x0);
-	__m128i curr_ref_XMM = *((__m128i *) (ref_bit_t));
+	__m128i curr_ref_XMM = *((__m128i *) (ref_vec));
 
 	__m128i read_XMM;
 	__m128i ref_XMM;
@@ -338,8 +308,8 @@ int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,
 	for (i = 0; i < total_byte; i += SSE_BYTE_NUM) {
 //		printf("\niteration: %d\n", i);
 
-		curr_read_XMM = *((__m128i *) (read_bit_t + i));
-		curr_ref_XMM = *((__m128i *) (ref_bit_t + i));
+		curr_read_XMM = *((__m128i *) (read_vec + i));
+		curr_ref_XMM = *((__m128i *) (ref_vec + i));
 
 		diff_XMM = _mm_xor_si128(curr_read_XMM, curr_ref_XMM);
 		diff_XMM = xor11complement_sse(diff_XMM);
@@ -348,7 +318,7 @@ int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,
 //			printf("WTF\n");
 			if (length % SSE_BASE_NUM11) {
 				mask = _mm_load_si128(
-						(__m128i *) (MASK_SSE_END1
+						(__m128i *) (MASK_SSE_END11
 								+ (length % SSE_BASE_NUM11) * SSE_BYTE_NUM));
 //				printf("Mask: \n");
 //				print128_bit(mask);
@@ -371,7 +341,7 @@ int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,
 			if (i + SSE_BYTE_NUM >= total_byte) {
 				if (length % SSE_BASE_NUM11) {
 					mask = _mm_load_si128(
-							(__m128i *) (MASK_SSE_END1
+							(__m128i *) (MASK_SSE_END11
 									+ (length % SSE_BASE_NUM11) * SSE_BYTE_NUM));
 					temp_diff_XMM = _mm_and_si128(mask, temp_diff_XMM);
 				}
@@ -396,7 +366,7 @@ int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,
 //				printf("WTF\n");
 				if (length % SSE_BASE_NUM11) {
 					mask = _mm_load_si128(
-							(__m128i *) (MASK_SSE_END1
+							(__m128i *) (MASK_SSE_END11
 									+ (length % SSE_BASE_NUM11) * SSE_BYTE_NUM));
 //					printf("Mask: \n");
 //					print128_bit(mask);
@@ -419,6 +389,33 @@ int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,
 	return 1;
 }
 
+#define _MAX_LENGTH_ 320
+
+uint8_t read_bit_t[_MAX_LENGTH_ / 4 + 16] __aligned__;
+uint8_t ref_bit_t[_MAX_LENGTH_ / 4 + 16] __aligned__;
+
+uint8_t read_vec0_t[SSE_BYTE_NUM] __aligned__;
+uint8_t read_vec1_t[SSE_BYTE_NUM] __aligned__;
+uint8_t ref_vec0_t[SSE_BYTE_NUM] __aligned__;
+uint8_t ref_vec1_t[SSE_BYTE_NUM] __aligned__;
+
+int bit_vec_filter_sse1(char* read, char* ref, int length, int max_error) {
+	//Get ready the bits
+	sse3_convert2bit1(read, read_vec0_t, read_vec1_t);
+	sse3_convert2bit1(ref, ref_vec0_t, ref_vec1_t);
+
+	//Get the mask
+	__m128i mask;
+	if (length > SSE_BASE_NUM1)
+		mask = _mm_set1_epi8(0xff);
+	else
+		mask = _mm_load_si128( (__m128i *) (MASK_SSE_END1 + (length *
+										SSE_BYTE_NUM)));
+
+	return bit_vec_filter_m128_sse1(read_vec0_t, read_vec1_t,
+					ref_vec0_t, ref_vec1_t, mask, max_error);
+}
+
 int bit_vec_filter_sse11(char* read, char* ref, int length, int max_error) {
 	//Get ready the bits
 //	memcpy(read_t, read, length * sizeof(char));
@@ -428,6 +425,27 @@ int bit_vec_filter_sse11(char* read, char* ref, int length, int max_error) {
 	sse3_convert2bit11(ref, length, ref_bit_t);
 
 	return bit_vec_filter_m128_sse11(read_bit_t, ref_bit_t, length, max_error);
+}
+
+void bit_vec_filter_sse_simulate1(char* read, char* ref, int length,
+		int max_error, int loc_num) {
+	//Get ready the bits
+	sse3_convert2bit1(read, read_vec0_t, read_vec1_t);
+	sse3_convert2bit1(ref, ref_vec0_t, ref_vec1_t);
+
+	//Get the mask
+	__m128i mask;
+	if (length > SSE_BASE_NUM1)
+		mask = _mm_set1_epi8(0xff);
+	else
+		mask = _mm_load_si128( (__m128i *) (MASK_SSE_END1 + (length *
+										SSE_BYTE_NUM)));
+
+	while (loc_num--)
+		bit_vec_filter_m128_sse1(read_vec0_t, read_vec1_t,
+					ref_vec0_t, ref_vec1_t, mask, max_error);
+
+	return;
 }
 
 void bit_vec_filter_sse_simulate11(char* read, char* ref, int length,
