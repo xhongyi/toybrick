@@ -1,8 +1,17 @@
-time ./vector_filter 128 1 1000000000 50
+====0 case====
+time ./vector_filter 128 0 1000000000 50                    
 
-real    25m22.882s
-user    25m15.487s
-sys     0m4.932s
+real    12m48.767s
+user    12m44.148s
+sys     0m3.388s
+
+
+====1 case====
+time ./vector_filter 128 1 1000000000 50                    
+
+real    40m9.743s
+user    39m58.374s
+sys     0m7.776s
 
 
 time ./popcount popcount11_m128i_sse 2 50000000000            
@@ -31,5 +40,40 @@ user    1m20.669s
 sys     0m0.020s
 
 
+====2 case====
+time ./vector_filter 128 2 1000000000 50
+
+real    62m35.904s
+user    62m18.622s
+sys     0m10.605s
+
+time ./shift 2 50000000000 128
+length=128, repeat count=100000000000
+
+real	9m8.664s
+user	9m6.594s
+sys	0m1.136s
+
+
+time ./timeSSE 2 50000000000 128                            
+error=2, length=128, repeat count=200000000000
+
+real    2m44.699s
+user    2m43.890s
+sys     0m0.496s
+
+
+====3 case====
+time ./vector_filter 128 3 1000000000 50                    
+
+real    93m52.688s
+user    93m33.255s
+sys     0m10.121s
+
+time with bit-flipping
+
+real    194m7.564s
+user    193m55.091s
+sys     0m0.360s
 
 
