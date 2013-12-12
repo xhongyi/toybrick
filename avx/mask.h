@@ -29,4 +29,9 @@ extern uint8_t *MASK_SSE_END11;
 extern uint8_t *MASK_SSE_BEG1;
 extern uint8_t *MASK_SSE_BEG11;
 
+extern uint8_t *MASK_0F;
+extern uint8_t *MASK_7F;
+
+extern uint8_t *MASK_0TO1;
+
 #endif // __MASK_H__

@@ -7,6 +7,7 @@
 #include "popcount.h"
 #include <stdio.h>
 #include <nmmintrin.h>
+#include "mask.h"
 
 #ifdef DEBUG
 #include <assert.h>
@@ -49,13 +50,11 @@ uint8_t POPCOUNT_4bit11[16] __aligned__ = {
 /* f */2 };
 
 uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
-	static char MASK_4bit[16] __aligned__ = { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf,
-			0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
-
+	
 	uint32_t result;
 
 	__asm__ volatile ("movdqu (%%rax), %%xmm7" : : "a" (map));
-	__asm__ volatile ("movdqu (%%rax), %%xmm6" : : "a" (MASK_4bit));
+	__asm__ volatile ("movdqu (%%rax), %%xmm6" : : "a" (MASK_0F));
 	__asm__ volatile ("pxor    %%xmm5, %%xmm5" : : );
 	// xmm5 -- global accumulator
 
@@ -122,13 +121,11 @@ uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
 }
 
 uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
-	static char MASK_4bit[16] __aligned__ = { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf,
-			0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf };
 
 	uint32_t result;
 
 	__asm__ volatile ("movdqu (%%rax), %%xmm7" : : "a" (map));
-	__asm__ volatile ("movdqu (%%rax), %%xmm6" : : "a" (MASK_4bit));
+	__asm__ volatile ("movdqu (%%rax), %%xmm6" : : "a" (MASK_0F));
 	// xmm5 -- global accumulator
 
 	result = 0;
@@ -141,7 +138,7 @@ uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
 			"movdqa    %%xmm0, %%xmm1	\n"
 
 			"psrlw         $4, %%xmm1	\n"
-			"pand      %%xmm6, %%xmm0	\n"	// xmm0 := lower nibbles
+			"pand      %%xmm6, %%xmm0	\n"// xmm0 := lower nibbles
 			"pand      %%xmm6, %%xmm1	\n"// xmm1 := higher nibbles
 
 			"movdqa    %%xmm7, %%xmm2	\n"

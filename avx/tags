@@ -3,53 +3,206 @@
 !_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
-!_TAG_PROGRAM_VERSION	5.8	//
-LOC_MASK	string_cp.c	/^uint8_t LOC_MASK[64] = {$/;"	v
-MAX	ssse3_popcount.c	342;"	d	file:
-MAX	ssse3_popcount.c	351;"	d	file:
-MAX	ssse3_popcount.c	468;"	d	file:
-MAX	ssse3_popcount.c	477;"	d	file:
-MAX	ssse3_popcount.c	548;"	d	file:
-MAX	ssse3_popcount.c	557;"	d	file:
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BASE_SIZE1	mask.h	18;"	d
+BASE_SIZE11	mask.h	23;"	d
+BIT_CONVERT_H_	bit_convert.h	9;"	d
+BOOST_PP_FILENAME_1	mask.c	38;"	d	file:
+BOOST_PP_FILENAME_1	mask.c	44;"	d	file:
+BOOST_PP_FILENAME_1	mask.c	53;"	d	file:
+BOOST_PP_ITERATION_LIMITS	mask.c	37;"	d	file:
+BOOST_PP_ITERATION_LIMITS	mask.c	43;"	d	file:
+BOOST_PP_ITERATION_LIMITS	mask.c	52;"	d	file:
+BYTE_BASE_NUM1	mask.h	20;"	d
+BYTE_BASE_NUM11	mask.h	25;"	d
+CC	Makefile	/^CC = g++$/;"	m
+CFLAGS	Makefile	/^CFLAGS = -g -march=native -I .$/;"	m
+CXX	Makefile	/^CXX = g++$/;"	m
+EXECUTABLE	Makefile	/^EXECUTABLE = popcount bit_convert vector_filter string_cp shift #ssse3_popcount$/;"	m
+FF_NUM	11masks.hpp	33;"	d
+FF_NUM	11masks.hpp	4;"	d
+FF_NUM	1masks.hpp	41;"	d
+FF_NUM	1masks.hpp	4;"	d
+I	11masks.hpp	1;"	d
+I	11masks.hpp	35;"	d
+I	1masks.hpp	1;"	d
+I	1masks.hpp	43;"	d
+LOC_MASK	string_cp.c	/^uint8_t LOC_MASK[64] = { 0xc0, 0xc0, 0xc0, 0xc0, \/\/1$/;"	v
+LOC_MASK1	bit_convert.c	/^uint8_t LOC_MASK1[128] = { 0x01, 0x01, 0x01, 0x01, \/\/1$/;"	v
+LOC_MASK11	bit_convert.c	/^uint8_t LOC_MASK11[64] = { 0x03, 0x03, 0x03, 0x03, \/\/1$/;"	v
+MASK_SSE_BEG1	mask.c	/^uint8_t* MASK_SSE_BEG1 = __MASK_SSE_BEG1_;$/;"	v
+MASK_SSE_BEG11	mask.c	/^uint8_t* MASK_SSE_BEG11 = __MASK_SSE_BEG11_;$/;"	v
+MASK_SSE_END1	mask.c	/^uint8_t* MASK_SSE_END1 = __MASK_SSE_END1_;$/;"	v
+MASK_SSE_END11	mask.c	/^uint8_t* MASK_SSE_END11 = __MASK_SSE_END11_;$/;"	v
+MAX	popcount.c	70;"	d	file:
+MAX	popcount.c	78;"	d	file:
+MAX	ssse3_popcount.c	256;"	d	file:
+MAX	ssse3_popcount.c	265;"	d	file:
+MAX	ssse3_popcount.c	344;"	d	file:
+MAX	ssse3_popcount.c	353;"	d	file:
+MAX	ssse3_popcount.c	470;"	d	file:
+MAX	ssse3_popcount.c	479;"	d	file:
+MAX	ssse3_popcount.c	550;"	d	file:
+MAX	ssse3_popcount.c	559;"	d	file:
+MAX_CHUNKS	popcountMain.c	14;"	d	file:
 MAX_CHUNKS	ssse3_popcount.c	43;"	d	file:
-OPT_COUNT	ssse3_popcount.c	633;"	d	file:
-OPT_COUNT	string_cp.c	273;"	d	file:
-VERIFY	ssse3_popcount.c	660;"	d	file:
-_MASK_UNIT_	string_cp.c	48;"	d	file:
+OPT_COUNT	bit_convertMain.c	13;"	d	file:
+OPT_COUNT	popcountMain.c	18;"	d	file:
+OPT_COUNT	ssse3_popcount.c	638;"	d	file:
+OPT_COUNT	string_cp.c	245;"	d	file:
+POPCOUNT_H_	popcount.h	9;"	d
+PRINT_DATA	11masks.hpp	2;"	d
+PRINT_DATA	11masks.hpp	36;"	d
+PRINT_DATA	1masks.hpp	2;"	d
+PRINT_DATA	1masks.hpp	44;"	d
+PRINT_H_	print.h	9;"	d
+READ_MODIFIER_H_	read_modifier.h	9;"	d
+SSE_BASE_NUM1	mask.h	19;"	d
+SSE_BASE_NUM11	mask.h	24;"	d
+SSE_BIT_LENGTH	mask.h	14;"	d
+SSE_BYTE_NUM	mask.h	15;"	d
+UNAME_S	Makefile	/^UNAME_S := $(shell uname -s)$/;"	m
+VECTOR_FILTER_H_	vector_filter.h	9;"	d
+VERIFY	popcountMain.c	36;"	d	file:
+VERIFY	ssse3_popcount.c	665;"	d	file:
+ZZ_NUM	11masks.hpp	21;"	d
+ZZ_NUM	11masks.hpp	34;"	d
+ZZ_NUM	1masks.hpp	29;"	d
+ZZ_NUM	1masks.hpp	42;"	d
+_MAX_LENGTH_	bit_convertMain.c	17;"	d	file:
 _MAX_LENGTH_	string_cp.c	46;"	d	file:
+_MAX_LENGTH_	vector_filter.c	395;"	d	file:
+_MAX_LENGTH_	vector_filterMain.c	81;"	d	file:
+_MAX_LENGTH_11_	bit_convertMain.c	18;"	d	file:
+__MASK_H__	mask.h	2;"	d
+__MASK_SSE_END11_	mask.c	/^uint8_t __MASK_SSE_END11_ [SSE_BIT_LENGTH * SSE_BYTE_NUM \/ BASE_SIZE11] = {$/;"	v
+__MASK_SSE_END1_	mask.c	/^uint8_t __MASK_SSE_END1_ [SSE_BIT_LENGTH * SSE_BYTE_NUM \/ BASE_SIZE1] = {$/;"	v
+__aligned__	bit_convert.c	/^char MASKA_16[16] __aligned__ = { 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A',$/;"	v
+__aligned__	bit_convert.c	/^char MASKC_16[16] __aligned__ = { 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',$/;"	v
+__aligned__	bit_convert.c	/^char MASKG_16[16] __aligned__ = { 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',$/;"	v
+__aligned__	bit_convert.c	/^char MASKT_16[16] __aligned__ = { 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T',$/;"	v
+__aligned__	bit_convert.c	/^uint8_t BASE_SHIFT11[16] __aligned__ = { 0x0, 0x4, 0x8, 0xc, 0x2, 0x6, 0xa, 0xe,$/;"	v
+__aligned__	bit_convert.c	/^uint8_t BASE_SHIFT1[16] __aligned__ = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13,$/;"	v
+__aligned__	bit_convert.c	/^uint8_t BASE_SHIFT2[16] __aligned__ = { 0, 1, 8, 9, 4, 5, 12, 13, 2, 3, 10, 11,$/;"	v
+__aligned__	bit_convert.c	/^uint8_t BIT_00[16] __aligned__ = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,$/;"	v
+__aligned__	bit_convert.c	/^uint8_t BIT_A_16[16] __aligned__ = { 0x00, 0x00, 0x00, 0x00, \/\/A$/;"	v
+__aligned__	bit_convert.c	/^uint8_t BIT_C_16[16] __aligned__ = { 0x55, 0x55, 0x55, 0x55, \/\/C$/;"	v
+__aligned__	bit_convert.c	/^uint8_t BIT_FF[16] __aligned__ = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,$/;"	v
+__aligned__	bit_convert.c	/^uint8_t BIT_G_16[16] __aligned__ = { 0xaa, 0xaa, 0xaa, 0xaa, \/\/G$/;"	v
+__aligned__	bit_convert.c	/^uint8_t BIT_T_16[16] __aligned__ = { 0xff, 0xff, 0xff, 0xff, \/\/T$/;"	v
+__aligned__	bit_convert.h	14;"	d
+__aligned__	bit_convertMain.c	/^char read_t[_MAX_LENGTH_] __aligned__;$/;"	v
+__aligned__	bit_convertMain.c	/^uint8_t read_bit0_t[_MAX_LENGTH_ \/ 8] __aligned__;$/;"	v
+__aligned__	bit_convertMain.c	/^uint8_t read_bit1_t[_MAX_LENGTH_ \/ 8] __aligned__;$/;"	v
+__aligned__	bit_convertMain.c	/^uint8_t read_bit_t[_MAX_LENGTH_ \/ 4] __aligned__;$/;"	v
+__aligned__	bit_convertMain.c	/^uint8_t ref_bit0_t[_MAX_LENGTH_11_ \/ 8] __aligned__;$/;"	v
+__aligned__	bit_convertMain.c	/^uint8_t ref_bit1_t[_MAX_LENGTH_11_ \/ 8] __aligned__;$/;"	v
+__aligned__	bit_convertMain.c	/^uint8_t ref_bit_t[_MAX_LENGTH_ \/ 4] __aligned__;$/;"	v
+__aligned__	mask.c	/^uint8_t __MASK_SSE_BEG11_ [128] __aligned__ = { 0xfc, 0xff, 0xff, 0xff, 0xff,$/;"	v
+__aligned__	mask.c	/^uint8_t __MASK_SSE_BEG1_ [128] __aligned__ = { 0xfe, 0xff, 0xff, 0xff, 0xff,$/;"	v
+__aligned__	mask.h	11;"	d
+__aligned__	popcount.c	/^uint8_t POPCOUNT_4bit11[16] __aligned__ = {$/;"	v
+__aligned__	popcount.c	/^uint8_t POPCOUNT_4bit[16] __aligned__ = {$/;"	v
+__aligned__	popcount.h	12;"	d
+__aligned__	popcountMain.c	/^uint8_t buffer[16 * MAX_CHUNKS] __aligned__;$/;"	v
+__aligned__	shiftMain.c	/^uint8_t buff[32] __aligned__;$/;"	v
 __aligned__	ssse3_popcount.c	/^uint32_t POPCOUNT_8bit[256] __aligned__ = {$/;"	v
 __aligned__	ssse3_popcount.c	/^uint8_t POPCOUNT_4bit[16] __aligned__ = {$/;"	v
 __aligned__	ssse3_popcount.c	/^uint8_t buffer[16*MAX_CHUNKS] __aligned__;$/;"	v
 __aligned__	ssse3_popcount.c	38;"	d	file:
 __aligned__	ssse3_popcount.c	40;"	d	file:
-__aligned__	string_cp.c	/^char A_filled_t[_MAX_LENGTH_] __aligned__ = {'A'};$/;"	v
+__aligned__	string_cp.c	/^char A_filled_t[_MAX_LENGTH_] __aligned__;$/;"	v
+__aligned__	string_cp.c	/^char MASKA_16[16] __aligned__ = { 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A',$/;"	v
+__aligned__	string_cp.c	/^char MASKC_16[16] __aligned__ = { 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C', 'C',$/;"	v
+__aligned__	string_cp.c	/^char MASKG_16[16] __aligned__ = { 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G',$/;"	v
+__aligned__	string_cp.c	/^char MASKT_16[16] __aligned__ = { 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T',$/;"	v
 __aligned__	string_cp.c	/^char read_t[_MAX_LENGTH_] __aligned__;$/;"	v
-__aligned__	string_cp.c	/^char ref_t[_MAX_LENGTH_] __aligned__;$/;"	v
-__aligned__	string_cp.c	/^uint64_t read_int64_t[_MAX_LENGTH_ \/ 32] __aligned__;$/;"	v
-__aligned__	string_cp.c	/^uint64_t ref_int64_t[_MAX_LENGTH_ \/ 32] __aligned__;$/;"	v
-__aligned__	string_cp.c	/^uint8_t BASE_MASK[64] __aligned__ = {$/;"	v
-__aligned__	string_cp.c	/^uint8_t BASE_SHIFT[16] __aligned__ = {$/;"	v
+__aligned__	string_cp.c	/^uint8_t BASE_SHIFT[16] __aligned__ = { 0x0, 0x4, 0x8, 0xc, 0x2, 0x6, 0xa, 0xe,$/;"	v
+__aligned__	string_cp.c	/^uint8_t BIT_A_16[16] __aligned__ = { 0x00, 0x00, 0x00, 0x00, \/\/A$/;"	v
+__aligned__	string_cp.c	/^uint8_t BIT_C_16[16] __aligned__ = { 0x55, 0x55, 0x55, 0x55, \/\/C$/;"	v
+__aligned__	string_cp.c	/^uint8_t BIT_G_16[16] __aligned__ = { 0xaa, 0xaa, 0xaa, 0xaa, \/\/G$/;"	v
+__aligned__	string_cp.c	/^uint8_t BIT_T_16[16] __aligned__ = { 0xff, 0xff, 0xff, 0xff, \/\/T$/;"	v
+__aligned__	string_cp.c	/^uint8_t read_bit_t[_MAX_LENGTH_ \/ 8] __aligned__;$/;"	v
+__aligned__	string_cp.c	/^uint8_t ref_bit_t[_MAX_LENGTH_ \/ 8] __aligned__;$/;"	v
 __aligned__	string_cp.c	41;"	d	file:
 __aligned__	string_cp.c	43;"	d	file:
-block	ssse3_popcount.c	355;"	d	file:
-body	ssse3_popcount.c	560;"	d	file:
-body	ssse3_popcount.c	579;"	d	file:
-c_convert2bit	string_cp.c	/^void c_convert2bit(char *str, int length, uint64_t *bits) {$/;"	f
+__aligned__	vector_filter.c	/^uint8_t MASK_01[32] __aligned__ = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,$/;"	v
+__aligned__	vector_filter.c	/^uint8_t read_bit_t[_MAX_LENGTH_ \/ 4 + 16] __aligned__;$/;"	v
+__aligned__	vector_filter.c	/^uint8_t read_vec0_t[SSE_BYTE_NUM] __aligned__;$/;"	v
+__aligned__	vector_filter.c	/^uint8_t read_vec1_t[SSE_BYTE_NUM] __aligned__;$/;"	v
+__aligned__	vector_filter.c	/^uint8_t ref_bit_t[_MAX_LENGTH_ \/ 4 + 16] __aligned__;$/;"	v
+__aligned__	vector_filter.c	/^uint8_t ref_vec0_t[SSE_BYTE_NUM] __aligned__;$/;"	v
+__aligned__	vector_filter.c	/^uint8_t ref_vec1_t[SSE_BYTE_NUM] __aligned__;$/;"	v
+__aligned__	vector_filter.h	12;"	d
+__aligned__	vector_filterMain.c	/^char read_t[_MAX_LENGTH_] __aligned__;$/;"	v
+__aligned__	vector_filterMain.c	/^char ref_t[_MAX_LENGTH_] __aligned__;$/;"	v
+add_del	read_modifier.c	/^void add_del(char* DNA, int length, int pos, char base) {$/;"	f
+add_ins	read_modifier.c	/^void add_ins(char* DNA, int length, int pos, char base) {$/;"	f
+add_mismatch	read_modifier.c	/^void add_mismatch(char* DNA, int length, int pos, char base) {$/;"	f
+add_mismatch_random	read_modifier.c	/^void add_mismatch_random(char* DNA, int length, int pos) {$/;"	f
+bit_vec_filter_m128_sse1	vector_filter.c	/^int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t$/;"	f
+bit_vec_filter_m128_sse11	vector_filter.c	/^int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,$/;"	f
+bit_vec_filter_sse1	vector_filter.c	/^int bit_vec_filter_sse1(char* read, char* ref, int length, int max_error) {$/;"	f
+bit_vec_filter_sse11	vector_filter.c	/^int bit_vec_filter_sse11(char* read, char* ref, int length, int max_error) {$/;"	f
+bit_vec_filter_sse_simulate1	vector_filter.c	/^void bit_vec_filter_sse_simulate1(char* read, char* ref, int length,$/;"	f
+bit_vec_filter_sse_simulate11	vector_filter.c	/^void bit_vec_filter_sse_simulate11(char* read, char* ref, int length,$/;"	f
+block	ssse3_popcount.c	357;"	d	file:
+body	ssse3_popcount.c	562;"	d	file:
+body	ssse3_popcount.c	581;"	d	file:
+builtin_popcount	popcount.c	/^uint32_t builtin_popcount(uint8_t* buffer, int chunks16) {$/;"	f
+c_convert2bit	bit_convert.c	/^void c_convert2bit(char *str, int length, uint8_t *bits) {$/;"	f
+c_convert2bit	string_cp.c	/^void c_convert2bit(char *str, int length, uint8_t *bits) {$/;"	f
 c_popcount	ssse3_popcount.c	/^uint32_t c_popcount(uint8_t* buffer, int chunks16) {$/;"	f
+flip_false_zero	vector_filter.c	/^__m128i flip_false_zero(__m128i vec) {$/;"	f
+functions	bit_convertMain.c	/^char* functions[OPT_COUNT] = { "verify", "serial", "sse3_11", "sse3_1" };$/;"	v
+functions	popcountMain.c	/^char* functions[OPT_COUNT] = { "verify", "popcount", "popcount11",$/;"	v
 functions	ssse3_popcount.c	/^char* functions[OPT_COUNT] = {$/;"	v
 functions	string_cp.c	/^char* functions[OPT_COUNT] = { "verify", "serial", "sse3" };$/;"	v
+help	bit_convertMain.c	/^void help(const char* progname) {$/;"	f
+help	popcountMain.c	/^void help(const char* progname) {$/;"	f
 help	ssse3_popcount.c	/^void help(const char* progname) {$/;"	f
 help	string_cp.c	/^void help(const char* progname) {$/;"	f
+left_alignr_helper	vector_filter.c	/^__m128i left_alignr_helper(__m128i curr, __m128i next, int shift_num) {$/;"	f
+main	bit_convertMain.c	/^int main(int argc, char* argv[]) {$/;"	f
+main	popcountMain.c	/^int main(int argc, char* argv[]) {$/;"	f
+main	shiftMain.c	/^int main(int argc, char* argv[]) {$/;"	f
 main	ssse3_popcount.c	/^int main(int argc, char* argv[]) {$/;"	f
 main	string_cp.c	/^int main(int argc, char* argv[]) {$/;"	f
-popcnt	ssse3_popcount.c	/^uint32_t popcnt(uint64_t* buffer, int chunks8) {$/;"	f
-simplecnt	ssse3_popcount.c	/^uint32_t simplecnt(uint64_t *buffer, int chunks8) {$/;"	f
+main	timeSSE.c	/^int main(int argc, char* argv[]) {$/;"	f
+main	vector_filterMain.c	/^int main(int argc, char* argv[]) {$/;"	f
+popcnt	ssse3_popcount.c	/^uint32_t popcnt(uint8_t* buffer, int chunks16) {$/;"	f
+popcount1	popcount.c	/^uint32_t popcount1(uint8_t *buffer, int chunks16) {$/;"	f
+popcount11	popcount.c	/^uint32_t popcount11(uint8_t *buffer, int chunks16) {$/;"	f
+popcount11_m128i_sse	popcount.c	/^uint32_t popcount11_m128i_sse(__m128i reg) {$/;"	f
+popcount11_sse	popcount.c	/^uint32_t popcount11_sse(uint8_t* buffer, int chunks16) {$/;"	f
+popcount1_m128i_sse	popcount.c	/^uint32_t popcount1_m128i_sse(__m128i reg) {$/;"	f
+popcount1_sse	popcount.c	/^uint32_t popcount1_sse(uint8_t* buffer, int chunks16) {$/;"	f
+print128_bit	print.c	/^void print128_bit(__m128i var) {$/;"	f
+print128_bit_twice	print.c	/^void print128_bit_twice(__m128i var) {$/;"	f
+print128_hex	print.c	/^void print128_hex(__m128i var) {$/;"	f
+printbytevector	print.c	/^void printbytevector(uint8_t *data, int length) {$/;"	f
+printbytevector_twice	print.c	/^void printbytevector_twice(uint8_t *data, int length) {$/;"	f
+right_alignr_helper	vector_filter.c	/^__m128i right_alignr_helper(__m128i prev, __m128i curr, int shift_num) {$/;"	f
+shift_left_sse1	vector_filter.c	/^__m128i shift_left_sse1(__m128i vec, int shift_num) {$/;"	f
+shift_left_sse11	vector_filter.c	/^__m128i shift_left_sse11(__m128i vec, __m128i next_vec, int shift_num) {$/;"	f
+shift_right_sse1	vector_filter.c	/^__m128i shift_right_sse1(__m128i vec, int shift_num) {$/;"	f
+shift_right_sse11	vector_filter.c	/^__m128i shift_right_sse11(__m128i pri_vec, __m128i vec, int shift_num) {$/;"	f
+simplecnt	ssse3_popcount.c	/^uint32_t simplecnt(uint8_t *buffer, int chunks16) {$/;"	f
 sse2_popcount1	ssse3_popcount.c	/^uint32_t sse2_popcount1(uint8_t* buffer, int chunks16) {$/;"	f
 sse2_popcount2	ssse3_popcount.c	/^uint32_t sse2_popcount2(uint8_t* buffer, int chunks16) {$/;"	f
 sse2_popcount3	ssse3_popcount.c	/^uint32_t sse2_popcount3(uint8_t* buffer, int chunks16) {$/;"	f
-sse3_convert2bit	string_cp.c	/^void sse3_convert2bit(char *str, int length, uint64_t *bits) {$/;"	f
+sse3_convert2bit	string_cp.c	/^void sse3_convert2bit(char *str, int length, uint8_t *bits) {$/;"	f
+sse3_convert2bit1	bit_convert.c	/^void sse3_convert2bit1(char *str, uint8_t *bits0, uint8_t *bits1) {$/;"	f
+sse3_convert2bit11	bit_convert.c	/^void sse3_convert2bit11(char *str, int length, uint8_t *bits) {$/;"	f
 ssse3_popcount1	ssse3_popcount.c	/^uint32_t ssse3_popcount1(uint8_t* buffer, int chunks16) {$/;"	f
 ssse3_popcount2	ssse3_popcount.c	/^uint32_t ssse3_popcount2(uint8_t* buffer, int chunks16) {$/;"	f
 ssse3_popcount3	ssse3_popcount.c	/^uint32_t ssse3_popcount3(uint8_t* buffer, int chunks16) {$/;"	f
-verify	ssse3_popcount.c	/^char verify(int index, uint32_t (*func)(uint64_t*, int), uint64_t *buffer, int chunks8, unsigned popcount_ref) {$/;"	f
+ssse3_popcount_core	popcount.c	/^uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {$/;"	f
+ssse3_popcount_m128_core	popcount.c	/^uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {$/;"	f
+verify	bit_convertMain.c	/^char verify(int index, void (*func)(char*, int, uint8_t*), char *str,$/;"	f
+verify	bit_convertMain.c	/^char verify(int index, void (*func)(char*, uint8_t*, uint8_t*), char *str,$/;"	f
+verify	popcountMain.c	/^char verify(int index, uint32_t (*func)(uint8_t*, int), uint8_t *buffer,$/;"	f
 verify	ssse3_popcount.c	/^char verify(int index, uint32_t (*func)(uint8_t*, int), uint8_t *buffer, int chunks16, unsigned popcount_ref) {$/;"	f
+verify	string_cp.c	/^char verify(int index, void (*func)(char*, int, uint8_t*), char *str, int length,$/;"	f
+verify_m128i	popcountMain.c	/^char verify_m128i(int index, uint32_t (*func)(__m128i), uint8_t *buffer,$/;"	f
+xor11complement_sse	vector_filter.c	/^__m128i xor11complement_sse(__m128i input) {$/;"	f
