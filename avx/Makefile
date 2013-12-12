@@ -49,7 +49,13 @@ timeSSE: timeSSE.c
 
 string_cp: print.o string_cp.c
 	$(CXX) $(CFLAGS) $^ -o $@
+		
+read_modifier.o: read_modifier.c read_modifier.h
+	$(CXX) $(CFLAGS) -c $< -o $@
 	
+test_modifier: test_modifier.c read_modifier.o
+	$(CXX) $(CFLAGS) $^ -o $@
+		
 #ssse3_popcount: ssse3_popcount.c
 #	$(CXX) $(CFLAGS) $< -o $@
 	
