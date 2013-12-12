@@ -142,6 +142,10 @@ __m128i left_alignr_helper(__m128i curr, __m128i next, int shift_num) {
 	}
 }
 
+__m128i flip_false_zero(__m128i vec) {
+	
+}
+
 __m128i shift_right_sse1(__m128i vec, int shift_num) {
 	if(shift_num == 8)	
 		return _mm_slli_si128(vec, 1);
