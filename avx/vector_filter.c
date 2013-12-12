@@ -222,6 +222,76 @@ __m128i xor11complement_sse(__m128i input) {
 	return result;
 }
 
+void flip_false_zero(__m128i& vec) {
+
+//	printf("vec: \t\t");
+//	print128_bit(vec);
+
+	//For not crossing bits
+	__m128i *boundary= (__m128i *) MASK_7F;
+//	printf("MASK_7F: \t");
+//	print128_bit(*boundary);
+
+	__m128i shift = _mm_and_si128(*boundary, vec);
+	
+//	printf("After and: \t");
+//	print128_bit(shift);
+
+	__m128i *mask = (__m128i *) MASK_0TO1;
+
+	shift = _mm_shuffle_epi8(*mask, shift);
+	vec = _mm_or_si128(vec, shift);
+	
+//	printf("Last cases %d: \t", 0);
+//	print128_bit(vec);
+
+	int i;
+	for (i = 1; i < 4; i++) {
+		shift = _mm_srli_epi16(vec, i);
+		shift = _mm_and_si128(*boundary, shift);
+//		printf("shift %d: \t", i);
+//		print128_bit(shift);
+		shift = _mm_shuffle_epi8(*mask, shift);
+//		printf("shuffle %d: \t", i);
+//		print128_bit(shift);
+		shift = _mm_slli_epi16(shift, i);
+		vec = _mm_or_si128(vec, shift);
+//		printf("Last cases %d: \t", i);
+//		print128_bit(vec);
+	}
+
+	//For the crossing bits
+	__m128i shifted_vec = shift_right_sse1(vec, 4);
+//	printf("shifted_vec: \t");
+//	print128_bit(shifted_vec);
+
+	shift = _mm_and_si128(*boundary, shifted_vec);
+//	printf("After and: \t");
+//	print128_bit(shift);
+	
+	shift = _mm_shuffle_epi8(*mask, shift);
+	shifted_vec = _mm_or_si128(shifted_vec, shift);
+//	printf("Cross cases %d: \t", 0);
+//	print128_bit(shifted_vec);
+
+	for (i = 1; i < 4; i++) {
+		shift = _mm_srli_epi16(shifted_vec, i);
+		shift = _mm_and_si128(*boundary, shift);
+		shift = _mm_shuffle_epi8(*mask, shift);
+		shift = _mm_slli_epi16(shift, i);
+		shifted_vec = _mm_or_si128(shifted_vec, shift);
+//		printf("Cross cases %d: \t", i);
+//		print128_bit(shifted_vec);
+	}
+
+	shifted_vec = shift_left_sse1(shifted_vec, 4);
+	vec = _mm_or_si128(shifted_vec, vec);
+//	printf("Final case: \t");
+//	print128_bit(vec);
+
+	
+}
+
 int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 				*ref_vec0, uint8_t *ref_vec1, __m128i mask, int max_error) {
 
@@ -261,6 +331,11 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 		temp_shift_XMM = _mm_xor_si128(shift_XMM, ref_XMM1);
 		temp_diff_XMM = _mm_or_si128(temp_shift_XMM, temp_diff_XMM);
 		temp_diff_XMM = _mm_and_si128(temp_diff_XMM, temp_mask);
+//		printf("Before flip: \t");
+//		print128_bit(temp_diff_XMM);
+		flip_false_zero(temp_diff_XMM);
+//		printf("After flip: \t");
+//		print128_bit(temp_diff_XMM);
 		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 
 		//printf("read shift %d diff_XMM: \n", j);
@@ -273,6 +348,11 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 		temp_shift_XMM = _mm_xor_si128(shift_XMM, read_XMM1);
 		temp_diff_XMM = _mm_or_si128(temp_shift_XMM, temp_diff_XMM);
 		temp_diff_XMM = _mm_and_si128(temp_diff_XMM, temp_mask);
+//		printf("Before flip: \t");
+//		print128_bit(temp_diff_XMM);
+		flip_false_zero(temp_diff_XMM);
+//		printf("After flip: \t");
+//		print128_bit(temp_diff_XMM);
 		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 		
 		//printf("ref shift %d diff_XMM: \n", j);
