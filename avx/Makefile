@@ -1,9 +1,8 @@
-EXECUTABLE = popcount bit_convert vector_filter string_cp shift #ssse3_popcount
+EXECUTABLE = popcount bit_convert vector_filter string_cp shift #ssse3_popcount test_modifier
 
 CXX = g++
 
 CC = g++
-
 CFLAGS = -O3 -march=native -I .
 
 UNAME_S := $(shell uname -s)
