@@ -367,6 +367,81 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 		return 1;
 }
 
+int bit_vec_filter_no_flipping_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
+				*ref_vec0, uint8_t *ref_vec1, __m128i mask, int max_error) {
+
+	int total_difference = 0;
+
+	//Start iteration
+	int j;
+	//read data
+	__m128i read_XMM0 = *((__m128i *) (read_vec0));
+	__m128i read_XMM1 = *((__m128i *) (read_vec1));
+	//ref data
+	__m128i ref_XMM0 = *((__m128i *) (ref_vec0));
+	__m128i ref_XMM1 = *((__m128i *) (ref_vec1));
+
+	__m128i shift_XMM;
+	__m128i diff_XMM;
+	__m128i temp_diff_XMM;
+	__m128i temp_shift_XMM;
+	__m128i temp_mask;
+
+	diff_XMM = _mm_xor_si128(read_XMM0, ref_XMM0);
+	temp_diff_XMM = _mm_xor_si128(read_XMM1, ref_XMM1);
+	diff_XMM = _mm_or_si128(diff_XMM, temp_diff_XMM);
+
+	//printf("diff_XMM: \n");
+	//print128_bit_twice(diff_XMM);
+
+	for (j = 1; j <= max_error; j++) {
+		temp_mask = _mm_load_si128( (__m128i *) (MASK_SSE_BEG1 + (j - 1) *
+								SSE_BYTE_NUM));
+		temp_mask = _mm_and_si128(temp_mask, mask);
+		
+		//Right shift read
+		shift_XMM = shift_right_sse1(read_XMM0, j);
+		temp_diff_XMM = _mm_xor_si128(shift_XMM, ref_XMM0);
+		shift_XMM = shift_right_sse1(read_XMM1, j);
+		temp_shift_XMM = _mm_xor_si128(shift_XMM, ref_XMM1);
+		temp_diff_XMM = _mm_or_si128(temp_shift_XMM, temp_diff_XMM);
+		temp_diff_XMM = _mm_and_si128(temp_diff_XMM, temp_mask);
+//		printf("Before flip: \t");
+//		print128_bit(temp_diff_XMM);
+//		flip_false_zero(temp_diff_XMM); //No flipping
+//		printf("After flip: \t");
+//		print128_bit(temp_diff_XMM);
+		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
+
+		//printf("read shift %d diff_XMM: \n", j);
+		//print128_bit_twice(diff_XMM);
+
+		//Right shift ref
+		shift_XMM = shift_right_sse1(ref_XMM0, j);
+		temp_diff_XMM = _mm_xor_si128(shift_XMM, read_XMM0);
+		shift_XMM = shift_right_sse1(ref_XMM1, j);
+		temp_shift_XMM = _mm_xor_si128(shift_XMM, read_XMM1);
+		temp_diff_XMM = _mm_or_si128(temp_shift_XMM, temp_diff_XMM);
+		temp_diff_XMM = _mm_and_si128(temp_diff_XMM, temp_mask);
+//		printf("Before flip: \t");
+//		print128_bit(temp_diff_XMM);
+//		flip_false_zero(temp_diff_XMM); //No flipping
+//		printf("After flip: \t");
+//		print128_bit(temp_diff_XMM);
+		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
+		
+		//printf("ref shift %d diff_XMM: \n", j);
+		//print128_bit_twice(diff_XMM);
+	}
+
+	total_difference = popcount11_m128i_sse(diff_XMM);
+
+	if (total_difference > max_error)
+		return 0;
+	else
+		return 1;
+}
+
 int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,
 		int max_error) {
 	const __m128i zero_mask = _mm_set1_epi8(0x00);
@@ -492,6 +567,23 @@ int bit_vec_filter_sse1(char* read, char* ref, int length, int max_error) {
 										SSE_BYTE_NUM)));
 
 	return bit_vec_filter_m128_sse1(read_vec0_t, read_vec1_t,
+					ref_vec0_t, ref_vec1_t, mask, max_error);
+}
+
+int bit_vec_filter_no_flipping_sse1(char* read, char* ref, int length, int max_error) {
+	//Get ready the bits
+	sse3_convert2bit1(read, read_vec0_t, read_vec1_t);
+	sse3_convert2bit1(ref, ref_vec0_t, ref_vec1_t);
+
+	//Get the mask
+	__m128i mask;
+	if (length >= SSE_BASE_NUM1)
+		mask = _mm_set1_epi8(0xff);
+	else
+		mask = _mm_load_si128( (__m128i *) (MASK_SSE_END1 + (length *
+										SSE_BYTE_NUM)));
+
+	return bit_vec_filter_no_flipping_m128_sse1(read_vec0_t, read_vec1_t,
 					ref_vec0_t, ref_vec1_t, mask, max_error);
 }
 
