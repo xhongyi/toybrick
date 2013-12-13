@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 	strcpy(read_t,
 			"TCGCTAGTAGCCGGAACTAACAGGTAGGCCTACATCAGCTATACGGCATCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
 	strcpy(ref_t,
-			"TCGCTAGTAGCCGGAATAACAGGTAGGCCTACATCTGCTATACGGCACGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGGAA");
+			"TCGCTAGTAGCCGGAACTAACAGGTAGGCCTACATCAGCTATACGGCATCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG");
 
 	if (argc >= 2)
 		length = atoi(argv[1]);
@@ -122,8 +122,8 @@ int main(int argc, char* argv[]) {
 
 //	while (repeat_count--)
 //		bit_vec_filter_sse_simulate11(read_t, ref_t, length, error, average_loc);
-//	while (repeat_count--)
-//		bit_vec_filter_sse_simulate1(read_t, ref_t, length, error, average_loc);
+	while (repeat_count--)
+		bit_vec_filter_sse_simulate1(read_t, ref_t, length, error, average_loc);
 //	if (bit_vec_filter_sse11(read_t, ref_t, length, error))
 //		printf("Pass Filter\n");
 //	else
@@ -134,10 +134,10 @@ int main(int argc, char* argv[]) {
 //	strcpy(ref_t,
 //			"TCGCTAGTAGCCGGAATAACAGGTAGGCCTACATCTGCTATACGGCACGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGGAA");
 //
-	if (bit_vec_filter_no_flipping_sse1(read_t, ref_t, length, error))
-		printf("Pass Filter\n");
-	else
-		printf("Fail Filter\n");
+//	if (bit_vec_filter_no_flipping_sse1(read_t, ref_t, length, error))
+//		printf("Pass Filter\n");
+//	else
+//		printf("Fail Filter\n");
 
 	return 0;
 
