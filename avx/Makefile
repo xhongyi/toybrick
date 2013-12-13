@@ -53,7 +53,7 @@ string_cp: print.o string_cp.c
 read_modifier.o: read_modifier.c read_modifier.h
 	$(CXX) $(CFLAGS) -c $< -o $@
 	
-test_modifier: test_modifier.c read_modifier.o
+test_modifier: mask.o print.o bit_convert.o popcount.o vector_filter.o read_modifier.o test_modifier.c 
 	$(CXX) $(CFLAGS) $^ -o $@
 		
 #ssse3_popcount: ssse3_popcount.c
