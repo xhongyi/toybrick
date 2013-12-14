@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 	int err = atoi(argv[3]);
 	int testErr = atoi(argv[2]);
 	int size = atoi(argv[1]);
-	int ret = test_alligner_random(&bit_vec_filter_no_flipping_sse1, DNA, size, testErr, err);
+	int ret = test_alligner_random(&bit_vec_filter_sse1, DNA, size, testErr, err);
 	printf("false positives: %d\n", ret);
 	
 /*

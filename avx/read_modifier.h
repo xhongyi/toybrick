@@ -9,10 +9,10 @@
 #define READ_MODIFIER_H_
 
 // Call this function to test fAlligner
-int test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int err);
+int test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err);
 
-int test_alligner_exhaust_helper(int (*fAlligner)(char *, char *, int, int), char* refDNA, char* modDNA, int length, int totErr, int err);
-int test_alligner_exhaust(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int err);
+int test_alligner_exhaust_helper(int (*fAlligner)(char *, char *, int, int), char* refDNA, char* modDNA, int length, int testErr, int totErr, int err);
+int test_alligner_exhaust(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err);
 
 void add_n_any(char* DNA, int length, int n);
 void add_n_mis(char* DNA, int length, int n);
