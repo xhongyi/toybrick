@@ -361,7 +361,7 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 
 	total_difference = popcount1_m128i_sse(diff_XMM);
 
-	if (total_difference > max_error)
+	if (total_difference > (max_error * 3 - 2) )
 		return 0;
 	else
 		return 1;
