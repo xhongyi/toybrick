@@ -20,14 +20,20 @@ int main(int argc, char* argv[]) {
 	memset(DNA,'A',200);
 	srand(time(0));
 
-	if (argc != 4) {
-		printf("Usage: %s <size> <e> <injected_error>\n", argv[0]);
+	if (argc != 5) {
+		printf("Usage: %s <size> <e> <injected_error> <function>\n", argv[0]);
 		exit(-1);
 	}
 	int err = atoi(argv[3]);
 	int testErr = atoi(argv[2]);
 	int size = atoi(argv[1]);
-	int ret = test_alligner_random(&bit_vec_filter_sse1, DNA, size, testErr, err);
+	int func = atoi(argv[4]);
+	if (func == 0) {
+		int ret = test_alligner_random(&bit_vec_filter_sse1, DNA, size, testErr, err);
+	} elseif (func == 1) {
+		int ret = test_alligner_random(&bit_vec_filter_no_flipping_sse1, DNA, size, testErr, err);
+	}
+
 	printf("false positives: %d\n", ret);
 	
 /*
