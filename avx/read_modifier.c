@@ -34,6 +34,61 @@ int printed_DNA;
 
 //srand(time(0));
 
+unsigned long long test_alligner_random(int (*fAlligner0)(char *, char *, int, int), int (*fAlligner1)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {
+	char* _refDNA = DNA;
+	char* _modDNA = (char*)malloc(sizeof(char) * length);
+	if (_modDNA == NULL) {
+		printf("malloc failed!!!\n");
+		exit(0);
+	}
+	memcpy(_modDNA, DNA, length);
+
+	// Estimate time
+	double estimated_time;
+	int e;
+	for (e=1; e<=err; e++) {
+		estimated_time = pow((12.0*length), (double)e)/ALIGNER_SPEED;
+		if (estimated_time > (double)MAX_TEST_MINS) {
+			e--;
+			estimated_time = pow((12.0*length), (double)e)/ALIGNER_SPEED;
+			break;
+		}
+	}
+
+	// Estimate iterations needed
+	if (err <= e) {
+#ifndef NO_WARNING
+		printf("Using exhaustive test!!!\n");
+#endif
+		unsigned long long ret = test_alligner_exhaust(fAlligner0, DNA, length, testErr, err);
+		printf("function0: %d\n", ret);
+		ret = test_alligner_exhaust(fAlligner1, DNA, length, testErr, err);
+		printf("function1: %d\n", ret);
+		free(_modDNA);
+		return ret;
+	}
+	int iterations = (int)((double)MAX_TEST_MINS/estimated_time);
+#ifndef NO_WARNING
+	printf("Using random test!!!\n");
+	printf("%d iterations needed...\n", iterations);
+	printf("Each iteration takes about %4.1f mins, total %4.1f mins\n", estimated_time, estimated_time*iterations);
+#endif
+
+	// Random tests
+	unsigned long long ret0 = 0, ret1 = 0;
+	for (int i=0;i<iterations;i++) {
+		add_n_any(_modDNA, length, err-e);
+		ret0 += test_alligner_exhaust_helper(fAlligner0, _refDNA, _modDNA, length, testErr, err, e);
+		printf("function0: %d\n", ret0);
+		memcpy(_modDNA, _refDNA, length);
+		ret1 = test_alligner_exhaust_helper(fAlligner1, _refDNA, _modDNA, length, testErr, err, e);
+		printf("function1: %d\n", ret1);
+		memcpy(_modDNA, _refDNA, length);
+	}
+	free(_modDNA);
+	return ret1;
+}
+
 unsigned long long test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {
 	char* _refDNA = DNA;
 	char* _modDNA = (char*)malloc(sizeof(char) * length);
@@ -65,7 +120,7 @@ unsigned long long test_alligner_random(int (*fAlligner)(char *, char *, int, in
 		return ret;
 	}
 	int iterations = (int)((double)MAX_TEST_MINS/estimated_time);
-#ifndef NO_WARNINGa
+#ifndef NO_WARNING
 	printf("Using random test!!!\n");
 	printf("%d iterations needed...\n", iterations);
 	printf("Each iteration takes about %4.1f mins, total %4.1f mins\n", estimated_time, estimated_time*iterations);

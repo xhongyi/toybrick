@@ -33,6 +33,8 @@ int main(int argc, char* argv[]) {
 		ret = test_alligner_random(&bit_vec_filter_sse1, DNA, size, testErr, err);
 	} else if (func == 1) {
 		ret = test_alligner_random(&bit_vec_filter_no_flipping_sse1, DNA, size, testErr, err);
+	} else if (func == 2) {
+		test_alligner_random(&bit_vec_filter_sse1, &bit_vec_filter_no_flipping_sse1, DNA, size, testErr, err);
 	}
 
 	printf("false positives: %lld\n", ret);
