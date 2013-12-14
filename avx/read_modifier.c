@@ -11,9 +11,13 @@
 #include <time.h>
 #include <assert.h>
 #include <math.h>
+#include <algorithm>
 
-#define MAX_TEST_MINS 200
+#define MAX_TEST_MINS 60
+#define ALIGNER_SPEED 200000000.0
+#define MAX_PRINT_DNA 1000
 
+int printed_DNA;
 
 //char * internal_DNA = NULL;
 //int internal_length = 0;
@@ -30,19 +34,23 @@
 
 //srand(time(0));
 
-int test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int err) {
+unsigned long long test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {
 	char* _refDNA = DNA;
 	char* _modDNA = (char*)malloc(sizeof(char) * length);
+	if (_modDNA == NULL) {
+		printf("malloc failed!!!\n");
+		exit(0);
+	}
 	memcpy(_modDNA, DNA, length);
-	
+
 	// Estimate time
 	double estimated_time;
 	int e;
 	for (e=1; e<=err; e++) {
-		estimated_time = pow((12.0*length), (double)e)/2000000000.0;
+		estimated_time = pow((12.0*length), (double)e)/ALIGNER_SPEED;
 		if (estimated_time > (double)MAX_TEST_MINS) {
 			e--;
-			estimated_time = pow((12.0*length), (double)e)/2000000000.0;
+			estimated_time = pow((12.0*length), (double)e)/ALIGNER_SPEED;
 			break;
 		}
 	}
@@ -52,7 +60,7 @@ int test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, 
 #ifndef NO_WARNING
 		printf("Using exhaustive test!!!\n");
 #endif
-		int ret = test_alligner_exhaust(fAlligner, DNA, length, err);
+		unsigned long long ret = test_alligner_exhaust(fAlligner, DNA, length, testErr, err);
 		free(_modDNA);
 		return ret;
 	}
@@ -64,88 +72,105 @@ int test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, 
 #endif
 
 	// Random tests
-	int ret = 0;
+	unsigned long long ret = 0;
 	for (int i=0;i<iterations;i++) {
 		add_n_any(_modDNA, length, err-e);
-		ret += test_alligner_exhaust_helper(fAlligner, _refDNA, _modDNA, length, err, e);
+		ret += test_alligner_exhaust_helper(fAlligner, _refDNA, _modDNA, length, testErr, err, e);
 		memcpy(_modDNA, _refDNA, length);
 	}
 	free(_modDNA);
 	return ret;
 }
 
-int test_alligner_exhaust_helper(int (*fAlligner)(char *, char *, int, int), char* refDNA, char* modDNA, int length, int totErr, int err) {
+unsigned long long test_alligner_exhaust_helper(int (*fAlligner)(char *, char *, int, int), char* refDNA, char* modDNA, int length, int testErr, int totErr, int err) {
 	if (err == 0) {
-		return !fAlligner(refDNA, modDNA, length, totErr);
+		char* _refDNA = (char*)malloc(sizeof(char) * std::max(129,length+1));
+		char* _modDNA = (char*)malloc(sizeof(char) * std::max(129,length+1));
+		memcpy(_refDNA, refDNA, length);
+		memcpy(_modDNA, modDNA, length);
+		unsigned long long ret = !(*fAlligner)(_refDNA, _modDNA, length, testErr);
+		if (ret && (printed_DNA < MAX_PRINT_DNA)) {
+			printed_DNA++;
+			memcpy(_modDNA, modDNA, length);
+			_modDNA[length] = '\0';
+			printf("Err: %s\n", _modDNA);
+		}
+		free(_refDNA);
+		free(_modDNA);
+		return ret;
 	} else {
 		char* _curModDNA = modDNA;
 		char* _nextModDNA = (char*)malloc(sizeof(char) * length);
-		int ret = 0;
+		unsigned long long ret = 0;
 		for (int i = 0; i < length; i++) {
-			
+
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_mis_pos_base(_nextModDNA, length, i, 'A');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
-			
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_mis_pos_base(_nextModDNA, length, i, 'G');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
-			
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_mis_pos_base(_nextModDNA, length, i, 'C');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
-			
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_mis_pos_base(_nextModDNA, length, i, 'T');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
-			
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_ins_pos_base(_nextModDNA, length, i, 'A');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
 
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_ins_pos_base(_nextModDNA, length, i, 'G');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
 
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_ins_pos_base(_nextModDNA, length, i, 'C');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
 
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_ins_pos_base(_nextModDNA, length, i, 'T');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
 
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_del_pos_base(_nextModDNA, length, i, 'A');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
 
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_del_pos_base(_nextModDNA, length, i, 'G');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
 
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_del_pos_base(_nextModDNA, length, i, 'C');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
 
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_del_pos_base(_nextModDNA, length, i, 'T');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, totErr, err-1);
+			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
 		}
 		free(_nextModDNA);
 		return ret;
 	}
 }
 
-int test_alligner_exhaust(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int err) {
+unsigned long long test_alligner_exhaust(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {
 	char* _refDNA = DNA;
 	char* _modDNA = (char*)malloc(sizeof(char) * length);
+	if (_modDNA == NULL) {
+		printf("malloc failed!!!\n");
+		exit(0);
+	}
 	memcpy(_modDNA, _refDNA, length);
 #ifndef NO_WARNING
 	double iterations = pow(12.0 * length, (double)err);
 	if (iterations)
-		printf("Warning: testing for %4.0f iterations, estimated runtime %4.1f mins!!!\n", iterations, iterations/2000000000.0);
+		printf("Warning: testing for %4.0f iterations, estimated runtime %4.1f mins!!!\n", iterations, iterations/ALIGNER_SPEED);
 #endif
-	int ret = test_alligner_exhaust_helper(fAlligner, _refDNA, _modDNA, length, err, err);
+	unsigned long long ret = test_alligner_exhaust_helper(fAlligner, _refDNA, _modDNA, length, testErr, err, err);
 	free(_modDNA);
 	return ret;
 }
