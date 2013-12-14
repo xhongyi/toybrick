@@ -316,8 +316,8 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 	temp_diff_XMM = _mm_xor_si128(read_XMM1, ref_XMM1);
 	diff_XMM = _mm_or_si128(diff_XMM, temp_diff_XMM);
 
-	//printf("diff_XMM: \n");
-	//print128_bit_twice(diff_XMM);
+//	printf("diff_XMM: \t");
+//	print128_bit(diff_XMM);
 
 	for (j = 1; j <= max_error; j++) {
 		temp_mask = _mm_load_si128( (__m128i *) (MASK_SSE_BEG1 + (j - 1) *
@@ -338,8 +338,8 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 //		print128_bit(temp_diff_XMM);
 		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 
-		//printf("read shift %d diff_XMM: \n", j);
-		//print128_bit_twice(diff_XMM);
+//		printf("diff_XMM: \t");
+//		print128_bit(diff_XMM);
 
 		//Right shift ref
 		shift_XMM = shift_right_sse1(ref_XMM0, j);
@@ -355,11 +355,11 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 //		print128_bit(temp_diff_XMM);
 		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 		
-		//printf("ref shift %d diff_XMM: \n", j);
-		//print128_bit_twice(diff_XMM);
+//		printf("diff_XMM: \t");
+//		print128_bit(diff_XMM);
 	}
 
-	total_difference = popcount11_m128i_sse(diff_XMM);
+	total_difference = popcount1_m128i_sse(diff_XMM);
 
 	if (total_difference > max_error)
 		return 0;
@@ -434,7 +434,7 @@ int bit_vec_filter_no_flipping_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1,
 		//print128_bit_twice(diff_XMM);
 	}
 
-	total_difference = popcount11_m128i_sse(diff_XMM);
+	total_difference = popcount1_m128i_sse(diff_XMM);
 
 	if (total_difference > max_error)
 		return 0;
