@@ -28,13 +28,14 @@ int main(int argc, char* argv[]) {
 	int testErr = atoi(argv[2]);
 	int size = atoi(argv[1]);
 	int func = atoi(argv[4]);
+	unsigned long long ret;
 	if (func == 0) {
-		int ret = test_alligner_random(&bit_vec_filter_sse1, DNA, size, testErr, err);
-	} elseif (func == 1) {
-		int ret = test_alligner_random(&bit_vec_filter_no_flipping_sse1, DNA, size, testErr, err);
+		ret = test_alligner_random(&bit_vec_filter_sse1, DNA, size, testErr, err);
+	} else if (func == 1) {
+		ret = test_alligner_random(&bit_vec_filter_no_flipping_sse1, DNA, size, testErr, err);
 	}
 
-	printf("false positives: %d\n", ret);
+	printf("false positives: %lld\n", ret);
 	
 /*
 	memcpy(DNA,"AAAAAAAAAAAA",13);

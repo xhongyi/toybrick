@@ -101,7 +101,7 @@ unsigned long long test_alligner_exhaust_helper(int (*fAlligner)(char *, char *,
 	} else {
 		char* _curModDNA = modDNA;
 		char* _nextModDNA = (char*)malloc(sizeof(char) * length);
-		unsinged long long ret = 0;
+		unsigned long long ret = 0;
 		for (int i = 0; i < length; i++) {
 
 			memcpy(_nextModDNA, _curModDNA, length);
