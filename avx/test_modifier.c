@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
 	char * DNA = (char*)malloc(sizeof(char) * 200);
 	int i;
 
-	memset(DNA,'A',200);
+	memcpy(DNA, "TCGCTAGTAGCCGGAACTAACAGGTAGGCCTACATCAGCTATACGGCATCGGCAACCTTGAGGGGCCGCGCCCCGTTACACTTTATACGTTTCCCTTGCAAGCCTTCGTGTCGGAGCATATGTATATGG",128);
 	srand(time(0));
 
 	if (argc != 5) {
