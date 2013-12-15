@@ -9,6 +9,7 @@
 #define READ_MODIFIER_H_
 
 // Call this function to test fAlligner
+unsigned long long test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err, unsigned long long iterations);
 unsigned long long test_alligner_random(int (*fAlligner0)(char *, char *, int, int), int (*fAlligner1)(char *, char *, int, int), char* DNA, int length, int testErr, int err);
 unsigned long long test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err);
 

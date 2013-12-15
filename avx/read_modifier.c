@@ -15,7 +15,7 @@
 
 #define MAX_TEST_MINS 60
 #define ALIGNER_SPEED 200000000.0
-#define MAX_PRINT_DNA 1000
+#define MAX_PRINT_DNA 100
 
 int printed_DNA;
 
@@ -34,13 +34,25 @@ int printed_DNA;
 
 //srand(time(0));
 
+unsigned long long test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err, unsigned long long iterations) {
+	char* _refDNA = DNA;
+	char* _modDNA = (char*)malloc(sizeof(char) * length);
+	memcpy(_modDNA, DNA, length);
+
+	// Random tests
+	unsigned long long ret = 0;
+	for (unsigned long long i=0;i<iterations;i++) {
+		add_n_any(_modDNA, length, err);
+		ret += test_alligner_exhaust_helper(fAlligner, _refDNA, _modDNA, length, testErr, err, 0);
+		memcpy(_modDNA, _refDNA, length);
+	}
+	free(_modDNA);
+	return ret;
+}
+
 unsigned long long test_alligner_random(int (*fAlligner0)(char *, char *, int, int), int (*fAlligner1)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {
 	char* _refDNA = DNA;
 	char* _modDNA = (char*)malloc(sizeof(char) * length);
-	if (_modDNA == NULL) {
-		printf("malloc failed!!!\n");
-		exit(0);
-	}
 	memcpy(_modDNA, DNA, length);
 
 	// Estimate time
@@ -92,10 +104,6 @@ unsigned long long test_alligner_random(int (*fAlligner0)(char *, char *, int, i
 unsigned long long test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {
 	char* _refDNA = DNA;
 	char* _modDNA = (char*)malloc(sizeof(char) * length);
-	if (_modDNA == NULL) {
-		printf("malloc failed!!!\n");
-		exit(0);
-	}
 	memcpy(_modDNA, DNA, length);
 
 	// Estimate time
@@ -143,7 +151,7 @@ unsigned long long test_alligner_exhaust_helper(int (*fAlligner)(char *, char *,
 		char* _modDNA = (char*)malloc(sizeof(char) * std::max(129,length+1));
 		memcpy(_refDNA, refDNA, length);
 		memcpy(_modDNA, modDNA, length);
-		unsigned long long ret = !(*fAlligner)(_refDNA, _modDNA, length, testErr);
+		unsigned long long ret = (*fAlligner)(_refDNA, _modDNA, length, testErr);
 		if (ret && (printed_DNA < MAX_PRINT_DNA)) {
 			printed_DNA++;
 			memcpy(_modDNA, modDNA, length);
@@ -223,10 +231,6 @@ unsigned long long test_alligner_exhaust_helper(int (*fAlligner)(char *, char *,
 unsigned long long test_alligner_exhaust(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {
 	char* _refDNA = DNA;
 	char* _modDNA = (char*)malloc(sizeof(char) * length);
-	if (_modDNA == NULL) {
-		printf("malloc failed!!!\n");
-		exit(0);
-	}
 	memcpy(_modDNA, _refDNA, length);
 #ifndef NO_WARNING
 	double iterations = pow(12.0 * length, (double)err);
