@@ -79,10 +79,10 @@ unsigned long long test_alligner_random(int (*fAlligner0)(char *, char *, int, i
 	for (int i=0;i<iterations;i++) {
 		add_n_any(_modDNA, length, err-e);
 		ret0 += test_alligner_exhaust_helper(fAlligner0, _refDNA, _modDNA, length, testErr, err, e);
-		printf("function0: %d\n", ret0);
+		printf("function0: %lld\n", ret0);
 		memcpy(_modDNA, _refDNA, length);
 		ret1 = test_alligner_exhaust_helper(fAlligner1, _refDNA, _modDNA, length, testErr, err, e);
-		printf("function1: %d\n", ret1);
+		printf("function1: %lld\n", ret1);
 		memcpy(_modDNA, _refDNA, length);
 	}
 	free(_modDNA);
