@@ -61,9 +61,9 @@ unsigned long long test_alligner_random(int (*fAlligner0)(char *, char *, int, i
 		printf("Using exhaustive test!!!\n");
 #endif
 		unsigned long long ret = test_alligner_exhaust(fAlligner0, DNA, length, testErr, err);
-		printf("function0: %d\n", ret);
+		printf("function0: %lld\n", ret);
 		ret = test_alligner_exhaust(fAlligner1, DNA, length, testErr, err);
-		printf("function1: %d\n", ret);
+		printf("function1: %lld\n", ret);
 		free(_modDNA);
 		return ret;
 	}
