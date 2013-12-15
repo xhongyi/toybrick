@@ -79,10 +79,10 @@ unsigned long long test_alligner_random(int (*fAlligner0)(char *, char *, int, i
 	for (int i=0;i<iterations;i++) {
 		add_n_any(_modDNA, length, err-e);
 		ret0 += test_alligner_exhaust_helper(fAlligner0, _refDNA, _modDNA, length, testErr, err, e);
-		printf("function0: %lld\n", ret0);
+		printf("function0: %d\n", ret0);
 		memcpy(_modDNA, _refDNA, length);
 		ret1 = test_alligner_exhaust_helper(fAlligner1, _refDNA, _modDNA, length, testErr, err, e);
-		printf("function1: %lld\n", ret1);
+		printf("function1: %d\n", ret1);
 		memcpy(_modDNA, _refDNA, length);
 	}
 	free(_modDNA);
@@ -160,20 +160,28 @@ unsigned long long test_alligner_exhaust_helper(int (*fAlligner)(char *, char *,
 		for (int i = 0; i < length; i++) {
 
 			memcpy(_nextModDNA, _curModDNA, length);
-			add_mis_pos_base(_nextModDNA, length, i, 'A');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+			if (_nextModDNA[i] != 'A') {
+				add_mis_pos_base(_nextModDNA, length, i, 'A');
+				ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+			}
 
 			memcpy(_nextModDNA, _curModDNA, length);
-			add_mis_pos_base(_nextModDNA, length, i, 'G');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+			if (_nextModDNA[i] != 'G') {
+				add_mis_pos_base(_nextModDNA, length, i, 'G');
+				ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+			}
 
 			memcpy(_nextModDNA, _curModDNA, length);
-			add_mis_pos_base(_nextModDNA, length, i, 'C');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+			if (_nextModDNA[i] != 'C') {
+				add_mis_pos_base(_nextModDNA, length, i, 'C');
+				ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+			}
 
 			memcpy(_nextModDNA, _curModDNA, length);
-			add_mis_pos_base(_nextModDNA, length, i, 'T');
-			ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+			if (_nextModDNA[i] != 'T') {
+				add_mis_pos_base(_nextModDNA, length, i, 'T');
+				ret += test_alligner_exhaust_helper(fAlligner, refDNA, _nextModDNA, length, testErr, totErr, err-1);
+			}
 
 			memcpy(_nextModDNA, _curModDNA, length);
 			add_ins_pos_base(_nextModDNA, length, i, 'A');
@@ -234,7 +242,7 @@ void add_n_any(char* DNA, int length, int n) {
 	for (int i=0;i<n;i++) {
 		switch (rand()%3) {
 			case 0:
-				add_mis_pos_base(DNA, length, rand()%length, get_rand_base());
+				add_mis_pos(DNA, length, rand()%length);
 				break;
 			case 1:
 				add_ins_pos_base(DNA, length, rand()%length, get_rand_base());
@@ -279,7 +287,10 @@ void add_del_pos_base(char* DNA, int length, int pos, char base) {
 }
 
 void add_mis_pos(char* DNA, int length, int pos) {
-	add_mis_pos_base(DNA, length, pos, get_rand_base());
+	char newb = get_rand_base();
+	while (newb == DNA[pos]) 
+		newb = get_rand_base();
+	add_mis_pos_base(DNA, length, pos, newb);
 }
 
 void add_ins_pos(char* DNA, int length, int pos) {
