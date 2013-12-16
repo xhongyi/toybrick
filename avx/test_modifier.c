@@ -35,6 +35,28 @@ int main(int argc, char* argv[]) {
 		ret = test_alligner_random(&bit_vec_filter_no_flipping_sse1, DNA, size, testErr, err, 1000000000ULL);
 	} else if (func == 2) {
 		test_alligner_random(&bit_vec_filter_sse1, &bit_vec_filter_no_flipping_sse1, DNA, size, testErr, err);
+	} else if (func == 3) {
+		char * modDNA = (char*)malloc(sizeof(char) * 200);
+		char * _refDNA = (char*)malloc(sizeof(char) * 200);
+		char * _modDNA = (char*)malloc(sizeof(char) * 200);
+		memcpy(modDNA,DNA,128);
+		add_n_any(modDNA,128,err+1);
+		for (int i=0;i<size;i++) {
+			memcpy(_refDNA,DNA,128);
+			memcpy(_modDNA,modDNA,128);
+			bit_vec_filter_sse_simulate1(_refDNA,_modDNA,128,err,testErr);
+		}
+	} else if (func == 4) {
+		char * modDNA = (char*)malloc(sizeof(char) * 200);
+		char * _refDNA = (char*)malloc(sizeof(char) * 200);
+		char * _modDNA = (char*)malloc(sizeof(char) * 200);
+		memcpy(modDNA,DNA,128);
+		add_n_any(modDNA,128,err+1);
+		for (int i=0;i<size;i++) {
+			memcpy(_refDNA,DNA,128);
+			memcpy(_modDNA,modDNA,128);
+			bit_vec_filter_no_flipping_sse_simulate1(_refDNA,_modDNA,128,err,testErr);
+		}
 	}
 
 	printf("false positives: %lld\n", ret);

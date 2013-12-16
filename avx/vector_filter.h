@@ -17,6 +17,7 @@
 
 // read and ref need to be 16 aligned
 void bit_vec_filter_sse_simulate1(char* read, char* ref, int length, int max_error, int loc_num);
+void bit_vec_filter_no_flipping_sse_simulate1(char* read, char* ref, int length, int max_error, int loc_num);
 void bit_vec_filter_sse_simulate11(char* read, char* ref, int length, int max_error, int loc_num);
 
 int bit_vec_filter_sse1(char* read, char* ref, int length, int max_error);

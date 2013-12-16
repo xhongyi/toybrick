@@ -598,6 +598,27 @@ int bit_vec_filter_sse11(char* read, char* ref, int length, int max_error) {
 	return bit_vec_filter_m128_sse11(read_bit_t, ref_bit_t, length, max_error);
 }
 
+void bit_vec_filter_no_flipping_sse_simulate1(char* read, char* ref, int length,
+		int max_error, int loc_num) {
+	//Get ready the bits
+	sse3_convert2bit1(read, read_vec0_t, read_vec1_t);
+	sse3_convert2bit1(ref, ref_vec0_t, ref_vec1_t);
+
+	//Get the mask
+	__m128i mask;
+	if (length >= SSE_BASE_NUM1)
+		mask = _mm_set1_epi8(0xff);
+	else
+		mask = _mm_load_si128( (__m128i *) (MASK_SSE_END1 + (length *
+										SSE_BYTE_NUM)));
+
+	while (loc_num--)
+		bit_vec_filter_no_flipping_m128_sse1(read_vec0_t, read_vec1_t,
+					ref_vec0_t, ref_vec1_t, mask, max_error);
+
+	return;
+}
+
 void bit_vec_filter_sse_simulate1(char* read, char* ref, int length,
 		int max_error, int loc_num) {
 	//Get ready the bits
