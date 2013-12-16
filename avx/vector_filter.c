@@ -21,7 +21,6 @@ uint8_t MASK_01[32] __aligned__ = { 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
 		0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55,
 		0x55 };
 
-
 /*
  * By little endians, left shift should actually be right shift in x86 convention
  */
@@ -316,8 +315,10 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 	temp_diff_XMM = _mm_xor_si128(read_XMM1, ref_XMM1);
 	diff_XMM = _mm_or_si128(diff_XMM, temp_diff_XMM);
 
-//	printf("diff_XMM: \t");
-//	print128_bit(diff_XMM);
+	flip_false_zero(diff_XMM);
+
+	printf("diff_XMM: \t");
+	print128_bit(diff_XMM);
 
 	for (j = 1; j <= max_error; j++) {
 		temp_mask = _mm_load_si128( (__m128i *) (MASK_SSE_BEG1 + (j - 1) *
@@ -331,15 +332,15 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 		temp_shift_XMM = _mm_xor_si128(shift_XMM, ref_XMM1);
 		temp_diff_XMM = _mm_or_si128(temp_shift_XMM, temp_diff_XMM);
 		temp_diff_XMM = _mm_and_si128(temp_diff_XMM, temp_mask);
-//		printf("Before flip: \t");
-//		print128_bit(temp_diff_XMM);
+		printf("Before flip: \t");
+		print128_bit(temp_diff_XMM);
 		flip_false_zero(temp_diff_XMM);
-//		printf("After flip: \t");
-//		print128_bit(temp_diff_XMM);
+		printf("After flip: \t");
+		print128_bit(temp_diff_XMM);
 		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 
-//		printf("diff_XMM: \t");
-//		print128_bit(diff_XMM);
+		printf("diff_XMM: \t");
+		print128_bit(diff_XMM);
 
 		//Right shift ref
 		shift_XMM = shift_right_sse1(ref_XMM0, j);
@@ -348,20 +349,22 @@ int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t
 		temp_shift_XMM = _mm_xor_si128(shift_XMM, read_XMM1);
 		temp_diff_XMM = _mm_or_si128(temp_shift_XMM, temp_diff_XMM);
 		temp_diff_XMM = _mm_and_si128(temp_diff_XMM, temp_mask);
-//		printf("Before flip: \t");
-//		print128_bit(temp_diff_XMM);
+		printf("Before flip: \t");
+		print128_bit(temp_diff_XMM);
 		flip_false_zero(temp_diff_XMM);
-//		printf("After flip: \t");
-//		print128_bit(temp_diff_XMM);
+		printf("After flip: \t");
+		print128_bit(temp_diff_XMM);
 		diff_XMM = _mm_and_si128(diff_XMM, temp_diff_XMM);
 		
-//		printf("diff_XMM: \t");
-//		print128_bit(diff_XMM);
+		printf("diff_XMM: \t");
+		print128_bit(diff_XMM);
 	}
 
 	total_difference = popcount1_m128i_sse(diff_XMM);
 
-	if (total_difference > (max_error * 3 - 2) )
+	printf("total_difference: %d\n", total_difference);
+
+	if (total_difference > (max_error) )
 		return 0;
 	else
 		return 1;
