@@ -156,8 +156,14 @@ unsigned long long test_alligner_exhaust_helper(int (*fAlligner)(char *, char *,
 			printed_DNA++;
 			memcpy(_modDNA, modDNA, length);
 			_modDNA[length] = '\0';
-			printf("Err: %s\n", _modDNA);
-		}
+			printf("%s\n", _modDNA);
+		}/* else if (!ret) {
+			memcpy(_refDNA, refDNA, length);
+			memcpy(_modDNA, modDNA, length);
+			_refDNA[length] = '\0';
+			_modDNA[length] = '\0';
+			printf("ref: %s\nmod: %s\n", _refDNA, _modDNA);
+		}*/
 		free(_refDNA);
 		free(_modDNA);
 		return ret;
@@ -281,13 +287,19 @@ void add_mis_pos_base(char* DNA, int length, int pos, char base) {
 }
 
 void add_ins_pos_base(char* DNA, int length, int pos, char base) {
-	memcpy(DNA + pos + 1, DNA + pos, length - pos - 1);
+	char *DNAold = (char*)malloc(sizeof(char) * length);
+	memcpy(DNAold, DNA, length);
+	memcpy(DNA + pos + 1, DNAold + pos, length - pos - 1);
 	DNA[pos] = base;
+	free(DNAold);
 }
 
 void add_del_pos_base(char* DNA, int length, int pos, char base) {
-	memcpy(DNA + pos, DNA + pos + 1, length - pos - 1);
+	char *DNAold = (char*)malloc(sizeof(char) * length);
+	memcpy(DNAold, DNA, length);
+	memcpy(DNA + pos, DNAold + pos + 1, length - pos - 1);
 	DNA[length - 1] = base;
+	free(DNAold);
 }
 
 void add_mis_pos(char* DNA, int length, int pos) {
