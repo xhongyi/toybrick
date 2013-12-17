@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
 	int size = atoi(argv[1]);
 	int func = atoi(argv[4]);
 	unsigned long long ret;
+	memset(DNA+128-err,'A',err);
 	if (func == 0) {
 		ret = test_alligner_random(&bit_vec_filter_sse1, DNA, size, testErr, err, 1000000ULL);
 	} else if (func == 1) {
