@@ -3,7 +3,8 @@
 !_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
-!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+!_TAG_PROGRAM_VERSION	5.8	//
+ALIGNER_SPEED	read_modifier.c	17;"	d	file:
 BASE_SIZE1	mask.h	18;"	d
 BASE_SIZE11	mask.h	23;"	d
 BIT_CONVERT_H_	bit_convert.h	9;"	d
@@ -16,9 +17,9 @@ BOOST_PP_ITERATION_LIMITS	mask.c	52;"	d	file:
 BYTE_BASE_NUM1	mask.h	20;"	d
 BYTE_BASE_NUM11	mask.h	25;"	d
 CC	Makefile	/^CC = g++$/;"	m
-CFLAGS	Makefile	/^CFLAGS = -g -march=native -I .$/;"	m
+CFLAGS	Makefile	/^CFLAGS = -O3 -march=native -I .$/;"	m
 CXX	Makefile	/^CXX = g++$/;"	m
-EXECUTABLE	Makefile	/^EXECUTABLE = popcount bit_convert vector_filter string_cp shift #ssse3_popcount$/;"	m
+EXECUTABLE	Makefile	/^EXECUTABLE = popcount bit_convert vector_filter string_cp shift #ssse3_popcount test_modifier$/;"	m
 FF_NUM	11masks.hpp	33;"	d
 FF_NUM	11masks.hpp	4;"	d
 FF_NUM	1masks.hpp	41;"	d
@@ -30,12 +31,15 @@ I	1masks.hpp	43;"	d
 LOC_MASK	string_cp.c	/^uint8_t LOC_MASK[64] = { 0xc0, 0xc0, 0xc0, 0xc0, \/\/1$/;"	v
 LOC_MASK1	bit_convert.c	/^uint8_t LOC_MASK1[128] = { 0x01, 0x01, 0x01, 0x01, \/\/1$/;"	v
 LOC_MASK11	bit_convert.c	/^uint8_t LOC_MASK11[64] = { 0x03, 0x03, 0x03, 0x03, \/\/1$/;"	v
+MASK_0F	mask.c	/^uint8_t* MASK_0F = __MASK_0F_;$/;"	v
+MASK_0TO1	mask.c	/^uint8_t* MASK_0TO1 = __MASK_0TO1_;$/;"	v
+MASK_7F	mask.c	/^uint8_t* MASK_7F = __MASK_7F_;$/;"	v
 MASK_SSE_BEG1	mask.c	/^uint8_t* MASK_SSE_BEG1 = __MASK_SSE_BEG1_;$/;"	v
 MASK_SSE_BEG11	mask.c	/^uint8_t* MASK_SSE_BEG11 = __MASK_SSE_BEG11_;$/;"	v
 MASK_SSE_END1	mask.c	/^uint8_t* MASK_SSE_END1 = __MASK_SSE_END1_;$/;"	v
 MASK_SSE_END11	mask.c	/^uint8_t* MASK_SSE_END11 = __MASK_SSE_END11_;$/;"	v
-MAX	popcount.c	70;"	d	file:
-MAX	popcount.c	78;"	d	file:
+MAX	popcount.c	87;"	d	file:
+MAX	popcount.c	95;"	d	file:
 MAX	ssse3_popcount.c	256;"	d	file:
 MAX	ssse3_popcount.c	265;"	d	file:
 MAX	ssse3_popcount.c	344;"	d	file:
@@ -46,6 +50,8 @@ MAX	ssse3_popcount.c	550;"	d	file:
 MAX	ssse3_popcount.c	559;"	d	file:
 MAX_CHUNKS	popcountMain.c	14;"	d	file:
 MAX_CHUNKS	ssse3_popcount.c	43;"	d	file:
+MAX_PRINT_DNA	read_modifier.c	18;"	d	file:
+MAX_TEST_MINS	read_modifier.c	16;"	d	file:
 OPT_COUNT	bit_convertMain.c	13;"	d	file:
 OPT_COUNT	popcountMain.c	18;"	d	file:
 OPT_COUNT	ssse3_popcount.c	638;"	d	file:
@@ -71,8 +77,7 @@ ZZ_NUM	1masks.hpp	29;"	d
 ZZ_NUM	1masks.hpp	42;"	d
 _MAX_LENGTH_	bit_convertMain.c	17;"	d	file:
 _MAX_LENGTH_	string_cp.c	46;"	d	file:
-_MAX_LENGTH_	vector_filter.c	395;"	d	file:
-_MAX_LENGTH_	vector_filterMain.c	81;"	d	file:
+_MAX_LENGTH_	vector_filter.c	549;"	d	file:
 _MAX_LENGTH_11_	bit_convertMain.c	18;"	d	file:
 __MASK_H__	mask.h	2;"	d
 __MASK_SSE_END11_	mask.c	/^uint8_t __MASK_SSE_END11_ [SSE_BIT_LENGTH * SSE_BYTE_NUM \/ BASE_SIZE11] = {$/;"	v
@@ -98,6 +103,9 @@ __aligned__	bit_convertMain.c	/^uint8_t read_bit_t[_MAX_LENGTH_ \/ 4] __aligned_
 __aligned__	bit_convertMain.c	/^uint8_t ref_bit0_t[_MAX_LENGTH_11_ \/ 8] __aligned__;$/;"	v
 __aligned__	bit_convertMain.c	/^uint8_t ref_bit1_t[_MAX_LENGTH_11_ \/ 8] __aligned__;$/;"	v
 __aligned__	bit_convertMain.c	/^uint8_t ref_bit_t[_MAX_LENGTH_ \/ 4] __aligned__;$/;"	v
+__aligned__	mask.c	/^uint8_t __MASK_0F_[16] __aligned__ = { 0xf, 0xf, 0xf, 0xf, 0xf, 0xf, 0xf,$/;"	v
+__aligned__	mask.c	/^uint8_t __MASK_0TO1_[16] __aligned__ = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x07,$/;"	v
+__aligned__	mask.c	/^uint8_t __MASK_7F_[16] __aligned__ = { 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f,$/;"	v
 __aligned__	mask.c	/^uint8_t __MASK_SSE_BEG11_ [128] __aligned__ = { 0xfc, 0xff, 0xff, 0xff, 0xff,$/;"	v
 __aligned__	mask.c	/^uint8_t __MASK_SSE_BEG1_ [128] __aligned__ = { 0xfe, 0xff, 0xff, 0xff, 0xff,$/;"	v
 __aligned__	mask.h	11;"	d
@@ -134,14 +142,23 @@ __aligned__	vector_filter.c	/^uint8_t ref_bit_t[_MAX_LENGTH_ \/ 4 + 16] __aligne
 __aligned__	vector_filter.c	/^uint8_t ref_vec0_t[SSE_BYTE_NUM] __aligned__;$/;"	v
 __aligned__	vector_filter.c	/^uint8_t ref_vec1_t[SSE_BYTE_NUM] __aligned__;$/;"	v
 __aligned__	vector_filter.h	12;"	d
-__aligned__	vector_filterMain.c	/^char read_t[_MAX_LENGTH_] __aligned__;$/;"	v
-__aligned__	vector_filterMain.c	/^char ref_t[_MAX_LENGTH_] __aligned__;$/;"	v
-add_del	read_modifier.c	/^void add_del(char* DNA, int length, int pos, char base) {$/;"	f
-add_ins	read_modifier.c	/^void add_ins(char* DNA, int length, int pos, char base) {$/;"	f
-add_mismatch	read_modifier.c	/^void add_mismatch(char* DNA, int length, int pos, char base) {$/;"	f
-add_mismatch_random	read_modifier.c	/^void add_mismatch_random(char* DNA, int length, int pos) {$/;"	f
+__aligned__	vector_filterMain.c	/^char read_t[128] __aligned__ = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";$/;"	v
+__aligned__	vector_filterMain.c	/^char ref_t[128] __aligned__ = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";$/;"	v
+add_del_pos	read_modifier.c	/^void add_del_pos(char* DNA, int length, int pos) {$/;"	f
+add_del_pos_base	read_modifier.c	/^void add_del_pos_base(char* DNA, int length, int pos, char base) {$/;"	f
+add_ins_pos	read_modifier.c	/^void add_ins_pos(char* DNA, int length, int pos) {$/;"	f
+add_ins_pos_base	read_modifier.c	/^void add_ins_pos_base(char* DNA, int length, int pos, char base) {$/;"	f
+add_mis_pos	read_modifier.c	/^void add_mis_pos(char* DNA, int length, int pos) {$/;"	f
+add_mis_pos_base	read_modifier.c	/^void add_mis_pos_base(char* DNA, int length, int pos, char base) {$/;"	f
+add_n_any	read_modifier.c	/^void add_n_any(char* DNA, int length, int n) {$/;"	f
+add_n_del	read_modifier.c	/^void add_n_del(char* DNA, int length, int n) {$/;"	f
+add_n_ins	read_modifier.c	/^void add_n_ins(char* DNA, int length, int n) {$/;"	f
+add_n_mis	read_modifier.c	/^void add_n_mis(char* DNA, int length, int n) {$/;"	f
 bit_vec_filter_m128_sse1	vector_filter.c	/^int bit_vec_filter_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t$/;"	f
 bit_vec_filter_m128_sse11	vector_filter.c	/^int bit_vec_filter_m128_sse11(uint8_t *read_vec, uint8_t *ref_vec, int length,$/;"	f
+bit_vec_filter_no_flipping_m128_sse1	vector_filter.c	/^int bit_vec_filter_no_flipping_m128_sse1(uint8_t *read_vec0, uint8_t *read_vec1, uint8_t$/;"	f
+bit_vec_filter_no_flipping_sse1	vector_filter.c	/^int bit_vec_filter_no_flipping_sse1(char* read, char* ref, int length, int max_error) {$/;"	f
+bit_vec_filter_no_flipping_sse_simulate1	vector_filter.c	/^void bit_vec_filter_no_flipping_sse_simulate1(char* read, char* ref, int length,$/;"	f
 bit_vec_filter_sse1	vector_filter.c	/^int bit_vec_filter_sse1(char* read, char* ref, int length, int max_error) {$/;"	f
 bit_vec_filter_sse11	vector_filter.c	/^int bit_vec_filter_sse11(char* read, char* ref, int length, int max_error) {$/;"	f
 bit_vec_filter_sse_simulate1	vector_filter.c	/^void bit_vec_filter_sse_simulate1(char* read, char* ref, int length,$/;"	f
@@ -153,11 +170,12 @@ builtin_popcount	popcount.c	/^uint32_t builtin_popcount(uint8_t* buffer, int chu
 c_convert2bit	bit_convert.c	/^void c_convert2bit(char *str, int length, uint8_t *bits) {$/;"	f
 c_convert2bit	string_cp.c	/^void c_convert2bit(char *str, int length, uint8_t *bits) {$/;"	f
 c_popcount	ssse3_popcount.c	/^uint32_t c_popcount(uint8_t* buffer, int chunks16) {$/;"	f
-flip_false_zero	vector_filter.c	/^__m128i flip_false_zero(__m128i vec) {$/;"	f
+flip_false_zero	vector_filter.c	/^void flip_false_zero(__m128i& vec) {$/;"	f
 functions	bit_convertMain.c	/^char* functions[OPT_COUNT] = { "verify", "serial", "sse3_11", "sse3_1" };$/;"	v
 functions	popcountMain.c	/^char* functions[OPT_COUNT] = { "verify", "popcount", "popcount11",$/;"	v
 functions	ssse3_popcount.c	/^char* functions[OPT_COUNT] = {$/;"	v
 functions	string_cp.c	/^char* functions[OPT_COUNT] = { "verify", "serial", "sse3" };$/;"	v
+get_rand_base	read_modifier.c	/^char get_rand_base() {$/;"	f
 help	bit_convertMain.c	/^void help(const char* progname) {$/;"	f
 help	popcountMain.c	/^void help(const char* progname) {$/;"	f
 help	ssse3_popcount.c	/^void help(const char* progname) {$/;"	f
@@ -168,8 +186,10 @@ main	popcountMain.c	/^int main(int argc, char* argv[]) {$/;"	f
 main	shiftMain.c	/^int main(int argc, char* argv[]) {$/;"	f
 main	ssse3_popcount.c	/^int main(int argc, char* argv[]) {$/;"	f
 main	string_cp.c	/^int main(int argc, char* argv[]) {$/;"	f
+main	test_modifier.c	/^int main(int argc, char* argv[]) {$/;"	f
 main	timeSSE.c	/^int main(int argc, char* argv[]) {$/;"	f
 main	vector_filterMain.c	/^int main(int argc, char* argv[]) {$/;"	f
+my_alligner	test_modifier.c	/^int my_alligner(char* refDNA, char* hongyiDNA, int length, int err) {$/;"	f
 popcnt	ssse3_popcount.c	/^uint32_t popcnt(uint8_t* buffer, int chunks16) {$/;"	f
 popcount1	popcount.c	/^uint32_t popcount1(uint8_t *buffer, int chunks16) {$/;"	f
 popcount11	popcount.c	/^uint32_t popcount11(uint8_t *buffer, int chunks16) {$/;"	f
@@ -182,6 +202,7 @@ print128_bit_twice	print.c	/^void print128_bit_twice(__m128i var) {$/;"	f
 print128_hex	print.c	/^void print128_hex(__m128i var) {$/;"	f
 printbytevector	print.c	/^void printbytevector(uint8_t *data, int length) {$/;"	f
 printbytevector_twice	print.c	/^void printbytevector_twice(uint8_t *data, int length) {$/;"	f
+printed_DNA	read_modifier.c	/^int printed_DNA;$/;"	v
 right_alignr_helper	vector_filter.c	/^__m128i right_alignr_helper(__m128i prev, __m128i curr, int shift_num) {$/;"	f
 shift_left_sse1	vector_filter.c	/^__m128i shift_left_sse1(__m128i vec, int shift_num) {$/;"	f
 shift_left_sse11	vector_filter.c	/^__m128i shift_left_sse11(__m128i vec, __m128i next_vec, int shift_num) {$/;"	f
@@ -199,6 +220,12 @@ ssse3_popcount2	ssse3_popcount.c	/^uint32_t ssse3_popcount2(uint8_t* buffer, int
 ssse3_popcount3	ssse3_popcount.c	/^uint32_t ssse3_popcount3(uint8_t* buffer, int chunks16) {$/;"	f
 ssse3_popcount_core	popcount.c	/^uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {$/;"	f
 ssse3_popcount_m128_core	popcount.c	/^uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {$/;"	f
+std	test_modifier.c	/^using namespace std;$/;"	v
+test_alligner_exhaust	read_modifier.c	/^unsigned long long test_alligner_exhaust(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {$/;"	f
+test_alligner_exhaust_helper	read_modifier.c	/^unsigned long long test_alligner_exhaust_helper(int (*fAlligner)(char *, char *, int, int), char* refDNA, char* modDNA, int length, int testErr, int totErr, int err) {$/;"	f
+test_alligner_random	read_modifier.c	/^unsigned long long test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {$/;"	f
+test_alligner_random	read_modifier.c	/^unsigned long long test_alligner_random(int (*fAlligner)(char *, char *, int, int), char* DNA, int length, int testErr, int err, unsigned long long iterations) {$/;"	f
+test_alligner_random	read_modifier.c	/^unsigned long long test_alligner_random(int (*fAlligner0)(char *, char *, int, int), int (*fAlligner1)(char *, char *, int, int), char* DNA, int length, int testErr, int err) {$/;"	f
 verify	bit_convertMain.c	/^char verify(int index, void (*func)(char*, int, uint8_t*), char *str,$/;"	f
 verify	bit_convertMain.c	/^char verify(int index, void (*func)(char*, uint8_t*, uint8_t*), char *str,$/;"	f
 verify	popcountMain.c	/^char verify(int index, uint32_t (*func)(uint8_t*, int), uint8_t *buffer,$/;"	f
