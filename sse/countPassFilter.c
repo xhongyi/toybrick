@@ -23,8 +23,10 @@ char ref_t[128] __aligned__;  // = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 
 int main(int argc, char* argv[]) {
 	
-	if (argc != 4)
-		printf("Usage: $>bin input output error");
+	if (argc != 4) {
+		printf("Usage: $>bin input output error\n");
+		exit(1);
+	}
 
 	int error = atoi(argv[3]);
 
