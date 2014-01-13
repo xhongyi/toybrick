@@ -18,8 +18,8 @@
 char read[128];
 char ref[128];
 
-char read_t[128] __aligned__; // = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-char ref_t[128] __aligned__;  // = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+char read_t[128] __aligned__ = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+char ref_t[128] __aligned__ = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
 int main(int argc, char* argv[]) {
 	
@@ -28,9 +28,9 @@ int main(int argc, char* argv[]) {
 
 	int error = atoi(argv[3]);
 
-	FILE *input;
+//	FILE *input;
 	FILE *output;
-	input = fopen(argv[1], "r");
+//	input = fopen(argv[1], "r");
 	output = fopen(argv[2], "w");
 	
 	size_t length;
@@ -39,11 +39,14 @@ int main(int argc, char* argv[]) {
 	int passNum = 0;
 	int totalNum = 0;
 
-	while (getline(&tempstr, &length, input) != -1) {
+//	while (getline(&tempstr, &length, input) != -1) {
+	while (read_t != "end_of_file") {
+		scanf(tempstr);
 		tempstr[strlen(tempstr) - 1] = '\0';
-		strncpy(read_t, tempstr, length);
+		strncpy(read_t, tempstr, lengkkth);
 		strncpy(read, tempstr, length);
-		getline(&tempstr, &length, input);
+//		getline(&tempstr, &length, input);
+		scanf(tempstr);
 		tempstr[strlen(tempstr) - 1] = '\0';
 		strncpy(ref_t, tempstr, length);
 		strncpy(ref, tempstr, length);
