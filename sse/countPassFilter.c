@@ -45,8 +45,8 @@ int main(int argc, char* argv[]) {
 	size_t length;
 	char* tempstr = NULL;
 
-	int passNum = 0;
-	int totalNum = 0;
+	long unsigned int passNum = 0;
+	long unsigned int totalNum = 0;
 
 //	while (getline(&tempstr, &length, input) != -1) {
 	do {
