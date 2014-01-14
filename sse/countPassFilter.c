@@ -28,25 +28,24 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 */
-	if (argc != 3) {
-		printf("Usage: $>bin output error\n");
+	if (argc != 2) {
+		printf("Usage: $>bin error\n");
 		exit(1);
 	}
 
 //	int error = atoi(argv[3]);
-	int error = atoi(argv[2]);
+	int error = atoi(argv[1]);
 
 //	FILE *input;
-	FILE *output;
+//	FILE *output;
 //	input = fopen(argv[1], "r");
 //	output = fopen(argv[2], "w");
-	output = fopen(argv[1], "w");
 	
 	size_t length;
 	char* tempstr = NULL;
 
-	long unsigned int passNum = 0;
-	long unsigned int totalNum = 0;
+	long long unsigned int passNum = 0;
+	long long unsigned int totalNum = 0;
 
 //	while (getline(&tempstr, &length, input) != -1) {
 	do {
@@ -66,19 +65,21 @@ int main(int argc, char* argv[]) {
 		strncpy(ref, tempstr, length);
 
 		if (bit_vec_filter_sse1(read_t, ref_t, length, error)) {
-			fprintf(output, "%s\n", read);
-			fprintf(output, "%s\n", ref);
+			printf("%s\n", read);
+			printf("%s\n", ref);
 			passNum++;
 		}
 
 		totalNum++;
 	} while (1);
 
-	printf("passNum:\t%d\n", passNum);
-	printf("totalNum:\t%d\n", totalNum);
+	printf("end_of_file\n");
+	printf("passNum:\t%lld\n", passNum);
+	printf("totalNum:\t%lld\n", totalNum);
+
 
 //	fclose(input);
-	fclose(output);
+//	fclose(output);
 
 	return 0;
 
