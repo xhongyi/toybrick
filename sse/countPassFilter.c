@@ -40,7 +40,8 @@ int main(int argc, char* argv[]) {
 //	FILE *output;
 //	input = fopen(argv[1], "r");
 //	output = fopen(argv[2], "w");
-	
+
+	size_t lineLength;	
 	size_t length;
 	char* tempstr = NULL;
 
@@ -49,20 +50,22 @@ int main(int argc, char* argv[]) {
 
 //	while (getline(&tempstr, &length, input) != -1) {
 	do {
-		getline(&tempstr, &length, stdin);
+		getline(&tempstr, &lineLength, stdin);
 		tempstr[strlen(tempstr) - 1] = '\0';
 		if (strcmp(tempstr, "end_of_file\0") == 0)
 				break;
 		length = strlen(tempstr);
 		if (length > 128)
-				length = 128;
+			length = 128;
 		strncpy(read_t, tempstr, length);
 		strncpy(read, tempstr, length);
 //		getline(&tempstr, &length, input);
-		getline(&tempstr, &length, stdin);
+		getline(&tempstr, &lineLength, stdin);
 		tempstr[strlen(tempstr) - 1] = '\0';
 		strncpy(ref_t, tempstr, length);
 		strncpy(ref, tempstr, length);
+//		printf("lineLength: %d, length: %lu\n", lineLength, length);
+//		printf("read_t:\t%s\nref_t:\t%s\n", read_t, ref_t);
 
 		if (bit_vec_filter_sse1(read_t, ref_t, length, error)) {
 			printf("%s\n", read);
