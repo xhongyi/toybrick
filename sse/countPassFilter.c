@@ -77,8 +77,8 @@ int main(int argc, char* argv[]) {
 	} while (1);
 
 	printf("end_of_file\n");
-	printf("passNum:\t%lld\n", passNum);
-	printf("totalNum:\t%lld\n", totalNum);
+	fprintf(stderr, "passNum:\t%lld\n", passNum);
+	fprintf(stderr, "totalNum:\t%lld\n", totalNum);
 
 
 //	fclose(input);
