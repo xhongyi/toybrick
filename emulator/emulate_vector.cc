@@ -20,13 +20,16 @@ vector_filter::vector_filter(int error, int min_matching) {
 
 vector_filter::~vector_filter() {
 	if (bit_vector != NULL) {
-		assert(this->error != 0);
-		for (int i = 0; i < (1 + 2 * this->error); i++)
+		for (int i = 0; i < (1 + 2 * error); i++)
 			delete [] bit_vector[i];
 
 		delete [] bit_vector;
 		bit_vector = NULL;
-	} 
+	}
+	if (result_vector != NULL) {
+		delete [] result_vector;
+		result_vector = NULL;
+	}
 }
 
 void vector_filter::set_error(int error) {
@@ -135,6 +138,7 @@ bool vector_filter::check_match() {
 		else
 			cout << '0';
 	}
+	cout << endl;
 
 	int errorCounter = 0;
 	int head = 0;
@@ -143,7 +147,7 @@ bool vector_filter::check_match() {
 
 	while (head < length) {
 		if (result_vector[head]) {
-			if (!in_error)
+			if (!in_error) {
 				in_error = true;
 				tail = head;	
 			}	
@@ -151,7 +155,10 @@ bool vector_filter::check_match() {
 		else {
 			if (in_error) {
 				in_error = false;
-				errorCounter += 1 + (head - tail) / min_matching;
+				if (min_matching == 0)
+					errorCounter += head - tail;
+				else
+					errorCounter += 1 + (head - tail + min_matching	- 2) / min_matching;
 				if (errorCounter > error)
 					return false;
 			}
@@ -159,8 +166,14 @@ bool vector_filter::check_match() {
 
 		head++;	
 	}
-	if (in_error)
-		errorCounter += 1 + (head + min_matching - 2 - tail) / min_matching;
+	if (in_error) {
+		if (min_matching == 0)
+			errorCounter += head - tail;
+		else
+			errorCounter += 1 + (head + min_matching - 2 - tail) / min_matching;
+	}
+
+	//cout << "errorCounter " << errorCounter << endl;
 
 	return (errorCounter <= error);
 }
@@ -209,7 +222,7 @@ void vector_filter::flip_bits(int index) {
 			tail++;
 		}
 	}
-
+/*
 	for (int i = 0; i < length; i++) {
 		if (bit_vector[index][i])
 			cout << '1';
@@ -217,4 +230,5 @@ void vector_filter::flip_bits(int index) {
 			cout << '0';
 	}
 	cout << endl;
+*/
 }
