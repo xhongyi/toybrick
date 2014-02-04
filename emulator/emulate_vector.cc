@@ -176,11 +176,6 @@ bool vector_filter::check_match() {
 	}
 
 	//cout << "errorCounter " << errorCounter << endl;
-	
-	if (errorCounter <= error) {
-		cout << read << endl;
-		cout << ref << endl;
-	}
 
 	return (errorCounter <= error);
 }
