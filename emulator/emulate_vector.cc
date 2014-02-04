@@ -47,7 +47,7 @@ void vector_filter::set_error(int error) {
 
 	this->error = error;
 
-	cout << "error: " << error << endl;
+//	cout << "error: " << error << endl;
 
 	bit_vector = new bool*[1 + 2 * error];
 	bit_vector[0] = NULL;
@@ -61,12 +61,12 @@ void vector_filter::set_error(int error) {
 }
 
 void vector_filter::set_length(int length) {
-	cout << "input length: " << length << endl;
+	//cout << "input length: " << length << endl;
 	
 	if (length == this->length)
 		return;
 
-	cout << " this->length: " << this->length << endl;
+	//cout << " this->length: " << this->length << endl;
 	
 	this->length = length;
 	
@@ -107,8 +107,8 @@ bool vector_filter::check_match() {
 	else
 		set_length(ref.length() );
 
-	cout << read << endl;
-	cout << ref << endl;
+	//cout << read << endl;
+	//cout << ref << endl;
 
 	for (int j = 0; j < length; j++) {
 		bit_vector[error][j] = !(read[j] == ref[j]);
@@ -132,6 +132,7 @@ bool vector_filter::check_match() {
 		}
 	}
 
+/*
 	for (int j = 0; j < length; j++) {
 		if (result_vector[j])
 			cout << '1';
@@ -139,6 +140,7 @@ bool vector_filter::check_match() {
 			cout << '0';
 	}
 	cout << endl;
+*/
 
 	int errorCounter = 0;
 	int head = 0;
@@ -174,6 +176,11 @@ bool vector_filter::check_match() {
 	}
 
 	//cout << "errorCounter " << errorCounter << endl;
+	
+	if (errorCounter <= error) {
+		cout << read << endl;
+		cout << ref << endl;
+	}
 
 	return (errorCounter <= error);
 }
