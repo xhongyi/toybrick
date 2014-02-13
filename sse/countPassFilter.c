@@ -68,17 +68,17 @@ int main(int argc, char* argv[]) {
 //		printf("read_t:\t%s\nref_t:\t%s\n", read_t, ref_t);
 
 		if (bit_vec_filter_sse1(read_t, ref_t, length, error)) {
-			printf("%s\n", read);
-			printf("%s\n", ref);
+			fprintf(stderr, "%s\n", read);
+			fprintf(stderr, "%s\n", ref);
 			passNum++;
 		}
 
 		totalNum++;
 	} while (1);
 
-	printf("end_of_file\n");
-	fprintf(stderr, "passNum:\t%lld\n", passNum);
-	fprintf(stderr, "totalNum:\t%lld\n", totalNum);
+	fprintf(stderr, "end_of_file\n");
+	printf("passNum:\t%lld\n", passNum);
+	printf("totalNum:\t%lld\n", totalNum);
 
 
 //	fclose(input);
