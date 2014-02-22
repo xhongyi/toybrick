@@ -4,7 +4,7 @@ CXX = g++
 
 CC = g++
 
-CFLAGS = -g -march=native -I .
+CFLAGS = -g -msse4.2 -I .
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)

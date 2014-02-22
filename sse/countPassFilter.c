@@ -18,6 +18,8 @@
 char read[128];
 char ref[128];
 
+char init_all_NULL[128] = "";
+
 char read_t[128] __aligned__;// = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 char ref_t[128] __aligned__;// = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
@@ -50,26 +52,39 @@ int main(int argc, char* argv[]) {
 
 //	while (getline(&tempstr, &length, input) != -1) {
 	do {
+		//clear past result
+		strncpy(read, init_all_NULL, 128);
+		strncpy(read_t, init_all_NULL, 128);
+		strncpy(ref, init_all_NULL, 128);
+		strncpy(ref_t, init_all_NULL, 128);
+
+		//get read
 		getline(&tempstr, &lineLength, stdin);
-		tempstr[strlen(tempstr) - 1] = '\0';
+		length = strlen(tempstr);
+		//Get rid of the new line character
+		tempstr[length - 1] = '\0';
 		if (strcmp(tempstr, "end_of_file\0") == 0)
 				break;
-		length = strlen(tempstr);
 		if (length > 128)
 			length = 128;
 		strncpy(read_t, tempstr, length);
 		strncpy(read, tempstr, length);
-//		getline(&tempstr, &length, input);
+
+		//get ref
 		getline(&tempstr, &lineLength, stdin);
-		tempstr[strlen(tempstr) - 1] = '\0';
+		length = strlen(tempstr);
+		//Get rid of the new line character
+		tempstr[length - 1] = '\0';
+		if (length > 128)
+			length = 128;
 		strncpy(ref_t, tempstr, length);
 		strncpy(ref, tempstr, length);
 //		printf("lineLength: %d, length: %lu\n", lineLength, length);
 //		printf("read_t:\t%s\nref_t:\t%s\n", read_t, ref_t);
 
 		if (bit_vec_filter_sse1(read_t, ref_t, length, error)) {
-			fprintf(stderr, "%s\n", read);
-			fprintf(stderr, "%s\n", ref);
+			fprintf(stderr, "%.*s\n", 128, read);
+			fprintf(stderr, "%.*s\n", 128, ref);
 			passNum++;
 		}
 
