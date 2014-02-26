@@ -32,7 +32,7 @@ pop_output = "pop_output.txt"
 # command line strings
 
 #   this command generates the reads
-generator_cmd = "./generator.py "+str(file1_name)+" "+str(file2_name)+" "+str(num_reads)+" "+str(num_read_len)+" "+str(num_edits)
+generator_cmd = "python generator.py "+str(file1_name)+" "+str(file2_name)+" "+str(num_reads)+" "+str(num_read_len)+" "+str(num_edits)
 
 #   this command runs the CUDA code
 gpu_cmd = "../inj_taylor_shift.out "+str(file1_name)+" "+str(file2_name)+" "+str(num_reads)+" "+str(num_read_len)+" "+str(num_edits_allowed)+" "+str(num_vicinity)+" "+str(num_shifts)
