@@ -184,7 +184,6 @@ __global__ void readcmp(/*char *dev_test_array,*/ char *a, char *b, /*char *resu
 	 * conservative reduction implemented by John Emmons Feb. 2014
 	 * EX. if vicinity = 3 then 111100110111111 -> 100100110100101
 	 */
-
 		
 	if(sdata[i] != 0 && (i == 0 || sdata[i-1] == 0)){	
 		int m, n = i;
@@ -203,7 +202,7 @@ __global__ void readcmp(/*char *dev_test_array,*/ char *a, char *b, /*char *resu
 			}
 			if(flag){
 				for(m -= 2; m > 0; m--)
-					sdata[n + m] = 0;
+					sdata[n + m] = 0x00;
 					n += vicinity;
 			}
 			else{ break; }	
@@ -367,7 +366,7 @@ int main(int argc, char *argv[]) {
     gpuErrchk(cudaMemcpy( dev_genome_2_data, genome_2_data, 
         (num_chars+PAD_AMT)*sizeof(char), cudaMemcpyHostToDevice ));    
 
-    /* conservative reduction debugging
+/* conservative reduction debugging
     gpuErrchk(cudaMemcpy( dev_test_array, test_array,
         16*sizeof(char), cudaMemcpyHostToDevice ));
     */
