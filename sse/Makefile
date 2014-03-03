@@ -4,8 +4,7 @@ CXX = g++
 
 CC = g++
 
-CFLAGS = -g -msse4.2 -I . -Isystem
-
+CFLAGS = -O3 -msse4.2 -I .
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
 endif
