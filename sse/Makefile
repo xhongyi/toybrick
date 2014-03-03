@@ -4,7 +4,7 @@ CXX = g++
 
 CC = g++
 
-CFLAGS = -g -msse4.2 -I .
+CFLAGS = -g -msse4.2 -I . -Isystem
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -41,7 +41,7 @@ mask.o: mask.c mask.h
 vector_filter: mask.o print.o bit_convert.o popcount.o vector_filter.o vector_filterMain.c
 	$(CC) $(CFLAGS) $^ -o $@
 
-countPassFilter: mask.o print.o bit_convert.o popcount.o vector_filter.o countPassFilter.c
+countPassFilter: mask.o print.o bit_convert.o popcount.o vector_filter.o countPassFilter.cc
 	$(CC) $(CFLAGS) $^ -o $@
 
 shift: mask.o print.o vector_filter.o popcount.o bit_convert.o shiftMain.c
