@@ -94,7 +94,7 @@ inline void gpuAssert(cudaError_t code, char *file, int line, bool abort=true)
  *      threshold.
  */
 
-__global__ void readcmp(/*char *dev_test_array,*/ char *a, char *b, /*char *result,*/ unsigned long nthreads, unsigned int str_len, unsigned int vicinity, unsigned int tstride, char *reduce, unsigned int pop_thresh, unsigned int threads_per_block, unsigned int shift_amt) {
+__global__ void readcmp(char *dev_test_array, char *a, char *b, /*char *result,*/ unsigned long nthreads, unsigned int str_len, unsigned int vicinity, unsigned int tstride, char *reduce, unsigned int pop_thresh, unsigned int threads_per_block, unsigned int shift_amt) {
 
     // Set up shared memory
     extern __shared__ char shared_data[];
@@ -110,7 +110,7 @@ __global__ void readcmp(/*char *dev_test_array,*/ char *a, char *b, /*char *resu
     int j, k;
 
     while(tid < nthreads) {
-
+	
         //make the first xor comparison without shifting
         result[i] = a[tid+PAD_AMT] ^ b[tid+PAD_AMT];
         __syncthreads();
@@ -161,8 +161,8 @@ __global__ void readcmp(/*char *dev_test_array,*/ char *a, char *b, /*char *resu
                         break;
                 }
                 if (sdata[i+j]!=0) {
-                    for (k=1; k<j; k++) {
-                        sdata[i+k]=0xff;
+			for (k=1; k<j; k++) {
+				sdata[i+k]=0xff;
                     }
                 }
             }
@@ -178,16 +178,18 @@ __global__ void readcmp(/*char *dev_test_array,*/ char *a, char *b, /*char *resu
         /////////////////////////////////////////////////////////////////////
  
         sdata[i] = result[i];
-        __syncthreads();
-
+	__syncthreads();
+	
+	
 	/*
 	 * conservative reduction implemented by John Emmons Feb. 2014
 	 * EX. if vicinity = 3 then 111100110111111 -> 100100110100101
 	 */
-		
+
+	
 	if(sdata[i] != 0 && (i == 0 || sdata[i-1] == 0)){	
 		int m, n = i;
-		bool flag = true;	
+		bool flag = true;
 		while(true){
 			for(m = 1; m < vicinity + 1; m++){
 				if(n + m < str_len) {
@@ -208,11 +210,12 @@ __global__ void readcmp(/*char *dev_test_array,*/ char *a, char *b, /*char *resu
 			else{ break; }	
 		}
 	}
-
 	__syncthreads();
-
+	
 	// conservative reduction debugging
-	//dev_test_array[i] = sdata[i];
+		
+	dev_test_array[i] = sdata[i];
+	__syncthreads();
 
         // do reduction in shared mem
         for(unsigned int s=str_len/2; s>0; s >>= 1){
@@ -263,7 +266,7 @@ __global__ void reduce(char *g_idata, char *g_odata, unsigned long nthreads, uns
 
         // write result for this block to global mem
         if (tid%str_len == 0) {
-            //g_odata[i/str_len] = (sdata[tid]<=pop_thresh)?1:0;
+            g_odata[i/str_len] = (sdata[tid]<=pop_thresh)?1:0;
             g_odata[i/str_len] = sdata[tid];
         }
 
@@ -311,7 +314,7 @@ int main(int argc, char *argv[]) {
     shift_amt = atoi(argv[7]); //the maximum shift amount when comparing reads
 
     /* calculate important values */
-    pop_thresh = (vicinity-1)*(errors-1) + errors; //popcount threshold
+    pop_thresh = /*(vicinity-1)*(errors-1) +*/ errors; //popcount threshold (is simply the num of allowed errors with conservative reduction)
     buffed_len = next_power_2(genome_len); //genome length + buffer space
     buffer_len = buffed_len - genome_len; //difference bw genome len and buf len
     unsigned long num_chars = num_genomes*buffed_len; //the total number of chars in every buffed read
@@ -324,10 +327,9 @@ int main(int argc, char *argv[]) {
     if(init_data_pad(&genome_2_data, num_chars))  return 1;
     if(init_data(&reduce_data, num_genomes)) return 1;
 
-    /* conservative reduction debugging
+    // conservative reduction debugging
     char* test_array;
-    if(init_data(&test_array, 16)) return 1;
-    */
+    if(init_data(&test_array, num_chars+PAD_AMT)) return 1;
 
     /* read in the data */
     if(read_data(genome_1_data, file_1, num_genomes, genome_len, buffer_len, buffed_len, vicinity+1))  return 1;
@@ -346,10 +348,9 @@ int main(int argc, char *argv[]) {
     gpuErrchk( cudaMalloc((void**)&dev_genome_2_data, (num_chars+PAD_AMT)*sizeof(char)));
     gpuErrchk( cudaMalloc((void**)&dev_reduce_data, num_genomes*sizeof(char) ));
 
-    /* conservative reduction debugging
+    // conservative reduction debugging
     char *dev_test_array;
-    gpuErrchk( cudaMalloc((void**)&dev_test_array, 16*sizeof(char) ));
-    */
+    gpuErrchk( cudaMalloc((void**)&dev_test_array, (num_chars+PAD_AMT)*sizeof(char) ));
 
       /******************/
      /** START TIMING **/
@@ -366,10 +367,9 @@ int main(int argc, char *argv[]) {
     gpuErrchk(cudaMemcpy( dev_genome_2_data, genome_2_data, 
         (num_chars+PAD_AMT)*sizeof(char), cudaMemcpyHostToDevice ));    
 
-/* conservative reduction debugging
+    // conservative reduction debugging
     gpuErrchk(cudaMemcpy( dev_test_array, test_array,
-        16*sizeof(char), cudaMemcpyHostToDevice ));
-    */
+        (num_chars+PAD_AMT)*sizeof(char), cudaMemcpyHostToDevice ));
 
     /* figure out thread count and dimensions for GPU */
     unsigned int num_blocks_x = 128;
@@ -380,7 +380,7 @@ int main(int argc, char *argv[]) {
     unsigned int log_len = log_2(buffed_len); //TODO: ALL OF THIS SHOULD PROBABLY BE MOVED ABOVE THE BEGINNING OF TIMING
 
     /* create and run GPU threads */
-    readcmp<<<grid_size,threads_per_block,2*threads_per_block>>>(/*dev_test_array,*/ dev_genome_1_data,
+    readcmp<<<grid_size,threads_per_block,2*threads_per_block>>>(dev_test_array, dev_genome_1_data,
             dev_genome_2_data,/* dev_result_data,*/ num_chars, buffed_len, vicinity,
             tstride, dev_reduce_data, pop_thresh, threads_per_block, shift_amt);
     gpuErrchk(cudaThreadSynchronize());
@@ -389,10 +389,9 @@ int main(int argc, char *argv[]) {
     gpuErrchk(cudaMemcpy( reduce_data, dev_reduce_data, 
                 num_genomes*sizeof(char), cudaMemcpyDeviceToHost ));
     
-    /* conservative reduction debugging
+    // conservative reduction debugging
     gpuErrchk(cudaMemcpy( test_array, dev_test_array,
-                16*sizeof(char), cudaMemcpyDeviceToHost ));
-    */
+                (num_chars + PAD_AMT) *sizeof(char), cudaMemcpyDeviceToHost ));
 
     /*========================================================================*/
 
@@ -418,11 +417,40 @@ int main(int argc, char *argv[]) {
             
     }
 
-    /* conservative reduction debugging
-    for(unsigned int i=0; i < 16; i++){
-	printf("the test_array: %u\n", test_array[i]);
-    }
-    */
+    // conservative reduction debugging
+	int j = 0;
+	int bad_strings[num_genomes];
+	for(int i=0; i < num_genomes; i++)
+		bad_strings[i] = 0;
+
+	// find the bad strings
+	for(int i=0; i < num_genomes; i++){
+		if (reduce_data[i]!=0)	
+			bad_strings[j] = i;
+			j++;
+	}
+
+	for(int i=0; i < num_genomes; i++){
+		if(bad_strings[i] != 0){
+			printf("genome number %d is a false negative\n", bad_strings[i]);
+			//printf("Original genome:\n");
+			for(int k=0; k < genome_len; k++){
+				printf("%c", genome_1_data[k + bad_strings[i]]);
+				}
+			printf("\n");
+			//printf("Edited genome:\n");
+			for(int k=0; k < genome_len; k++){ 
+				printf("%c", genome_1_data[k + bad_strings[i]]);
+			}
+			printf("\n");
+
+		}
+	}
+        
+//      for(unsigned int i=0; i < num_chars + PAD_AMT; i++){
+//	printf("the test_array: %i\n", test_array[i]);
+//      }
+    
 
     pop_count_file = fopen("pop_output.txt","w");
     fprintf(pop_count_file, "%d %d\n", matches, num_genomes-matches);
