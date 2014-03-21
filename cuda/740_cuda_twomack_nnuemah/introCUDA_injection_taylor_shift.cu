@@ -425,9 +425,10 @@ int main(int argc, char *argv[]) {
 
 	// find the bad strings
 	for(int i=0; i < num_genomes; i++){
-		if (reduce_data[i]!=0)	
+		if (reduce_data[i]!=0){	
 			bad_strings[j] = i;
 			j++;
+		}
 	}
 
 	for(int i=0; i < num_genomes; i++){
@@ -440,7 +441,7 @@ int main(int argc, char *argv[]) {
 			printf("\n");
 			//printf("Edited genome:\n");
 			for(int k=0; k < genome_len; k++){ 
-				printf("%c", genome_1_data[k + bad_strings[i]]);
+				printf("%c", genome_2_data[k + bad_strings[i]]);
 			}
 			printf("\n");
 
