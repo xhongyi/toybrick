@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
 	
 	string *read_strs = new string [BATCH_RUN];
 	string *ref_strs = new string [BATCH_RUN];
+	bool *valid_buff = new bool [BATCH_RUN];
 
 	if (argc != 2) {
 		printf("Usage: $>bin error\n");
@@ -87,6 +88,7 @@ int main(int argc, char* argv[]) {
 			//Get rid of the new line character
 			tempstr[length - 1] = '\0';
 			ref_strs[read_size].assign(tempstr);
+			valid_buff[read_size] = false;
 		}
 
 		times(&start_time);
@@ -108,17 +110,23 @@ int main(int argc, char* argv[]) {
 				length = 128;
 			strncpy(ref_t, ref_strs[read_idx].c_str(), length);
 
-			if (bit_vec_filter_sse1(read_t, ref_t, length, error)) {
+			if (bit_vec_filter_sse1(read_t, ref_t, length, error))
+				valid_buff[read_idx] = true;
+		}
+
+		times(&end_time);
+
+		for (read_idx = 0; read_idx < read_size; read_idx++) {
+
+			if (valid_buff[read_idx]) {
 				fprintf(stderr, "%.*s\n", 128, read_strs[read_idx].c_str() );
 				fprintf(stderr, "%.*s\n", 128, ref_strs[read_idx].c_str() );
 				passNum++;
 			}
-			
 			totalNum++;
-		
 		}
+
 		
-		times(&end_time);
 		elp_time.tms_stime += end_time.tms_stime - start_time.tms_stime;
 		elp_time.tms_utime += end_time.tms_utime - start_time.tms_utime;
 

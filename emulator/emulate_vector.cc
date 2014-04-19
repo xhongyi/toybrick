@@ -132,7 +132,6 @@ bool vector_filter::check_match() {
 		}
 	}
 
-/*
 	for (int j = 0; j < length; j++) {
 		if (result_vector[j])
 			cout << '1';
@@ -140,7 +139,6 @@ bool vector_filter::check_match() {
 			cout << '0';
 	}
 	cout << endl;
-*/
 
 	int errorCounter = 0;
 	int head = 0;
@@ -224,7 +222,7 @@ void vector_filter::flip_bits(int index) {
 			tail++;
 		}
 	}
-/*
+	
 	for (int i = 0; i < length; i++) {
 		if (bit_vector[index][i])
 			cout << '1';
@@ -232,5 +230,4 @@ void vector_filter::flip_bits(int index) {
 			cout << '0';
 	}
 	cout << endl;
-*/
 }
