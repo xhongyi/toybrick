@@ -5,17 +5,18 @@
 vector_filter::vector_filter() {
 	bit_vector = NULL;
 	result_vector = NULL;
-	length = 0;
-	set_error(0);
-	min_matching = 0;
+	error = -1;
+	length = -1;
+	min_matching = -1;
 };
 
 vector_filter::vector_filter(int error, int min_matching) {
 	bit_vector = NULL;
 	result_vector = NULL;
-	length = 0;
-	set_error(error);
+	length = -1;
+	this->error = -1;
 	this->min_matching = min_matching;
+	set_error(error);
 }
 
 vector_filter::~vector_filter() {
@@ -53,7 +54,7 @@ void vector_filter::set_error(int error) {
 	bit_vector[0] = NULL;
 
 	for (int i = 0; i < (1 + 2 * error); i++) {
-		if (length == 0)
+		if (length <= 0)
 			bit_vector[i] = NULL;
 		else
 			bit_vector[i] = new bool[length]();
@@ -69,7 +70,7 @@ void vector_filter::set_length(int length) {
 	//cout << " this->length: " << this->length << endl;
 	
 	this->length = length;
-	
+
 	for (int i = 0; i < (1 + 2 * error); i++) {
 		if (bit_vector[i] != NULL) {
 			delete [] bit_vector[i];

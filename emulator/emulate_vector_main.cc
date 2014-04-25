@@ -18,7 +18,6 @@ int main(int argc, char* argv[]) {
 	string read;
 	string ref;
 
-
 	if (argc != 3) {
 		cout << "Usage: $>bin error min_match" << endl;
 		exit(1);
