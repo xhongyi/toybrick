@@ -1,0 +1,13 @@
+-----
+The code was run, but with the bitvector computations removed.
+
+the following command was used to run the code
+
+    >$ ./countPassFilter 3 < check0
+
+passNum:        0
+totalNum:       10125060
+total_time: 1.250000
+
+
+
