@@ -3,7 +3,7 @@ import os
 
 RUNS_PER_TEST = 1
 INPUT_READ_FILE = 'check0'
-OUTPUT_BENCHMARK_FILE = prefetch_updated_results.log
+OUTPUT_BENCHMARK_FILE = 'prefetch_updated_results.log'
 
 f = open(OUTPUT_BENCHMARK_FILE, "w")
 
