@@ -19,7 +19,6 @@
 #include <emmintrin.h>
 
 #define BATCH_RUN 1000000 
-#define CACHE_LINE_SIZE 64 // bytes per line
 
 using namespace std;
 
@@ -39,7 +38,7 @@ int main(int argc, char* argv[]) {
 	string *ref_strs = new string [BATCH_RUN];
 	bool *valid_buff = new bool [BATCH_RUN];
 
-	if (argc != 3) {
+	if (argc != 2) {
 		printf("Usage: $>bin error\n");
 		exit(1);
 	}
@@ -48,11 +47,9 @@ int main(int argc, char* argv[]) {
 	 * capture the CLI inputs 
 	 */
 	const int error = atoi(argv[1]);
-	const int PREFETCH_HEAD_START = atoi(argv[2]);
 
 	// declare a helper array for testing
 	int* random_indices; 
-	
 
 	size_t lineLength;	
 	size_t length;
@@ -114,38 +111,8 @@ int main(int argc, char* argv[]) {
 
 		times(&start_time);
 
-		/*
-		 * get the prefetches that are before the head start
-		 */
-		int i;
-		for (i = 0; i < PREFETCH_HEAD_START; i++){
+		for (int i = 0; i < read_size; i++) {
 
-		  /*
-		   * _mm_prefetch only pulls in enough data to fill one cache line
-		   * so we must make two requests for each read and ref pair
-		   */
-  		  _mm_prefetch(read_strs + random_indices[i], _MM_HINT_NTA);
-		  _mm_prefetch(read_strs[random_indices[i]].c_str() + CACHE_LINE_SIZE, _MM_HINT_NTA);
-
-		  _mm_prefetch(ref_strs + random_indices[i], _MM_HINT_NTA);
-		  _mm_prefetch(ref_strs[random_indices[i]].c_str() + CACHE_LINE_SIZE, _MM_HINT_NTA);
-
-		}
-
-		/*
-		 * begin the main loop (stops PREFETCH_HEAD_START from the end)
-		 */
-		for (i = 0; i < read_size - PREFETCH_HEAD_START; i++) {
-			
-		  // make the next prefetch request
-		  const int next_prefetch = random_indices[i + PREFETCH_HEAD_START];
-
-		  _mm_prefetch(read_strs + next_prefetch, _MM_HINT_NTA);
-                  _mm_prefetch(read_strs[next_prefetch].c_str() + CACHE_LINE_SIZE, _MM_HINT_NTA);
-
-                  _mm_prefetch(ref_strs + next_prefetch, _MM_HINT_NTA);
-                  _mm_prefetch(ref_strs[next_prefetch].c_str() + CACHE_LINE_SIZE, _MM_HINT_NTA);
-		  
 		  // perform bitvector computations on the 
 			strncpy(read_t, init_all_NULL, 128);
 			strncpy(ref_t, init_all_NULL, 128);
@@ -165,33 +132,6 @@ int main(int argc, char* argv[]) {
 			if (bit_vec_filter_sse1(read_t, ref_t, length, error))
 				valid_buff[random_indices[i]] = true;
 		}
-
-		/*
-		 * perform the last few bitvector comutations (prefetching has reached the end)
-		 * read_idx is not inititalized because we are continuing where we left off
-		 */
-		for (; i < read_size; i++) {
-		
-		  // perform bitvector computations on the 
-			strncpy(read_t, init_all_NULL, 128);
-			strncpy(ref_t, init_all_NULL, 128);
-
-			length = read_strs[random_indices[i]].length();
-
-			if (length > 128)
-				length = 128;
-			strncpy(read_t, read_strs[random_indices[i]].c_str(), length);
-
-			length = ref_strs[random_indices[i]].length();
-			//Get rid of the new line character
-			if (length > 128)
-				length = 128;
-			strncpy(ref_t, ref_strs[random_indices[i]].c_str(), length);
-
-			if (bit_vec_filter_sse1(read_t, ref_t, length, error))
-				valid_buff[random_indices[i]] = true;
-		}
-
 
 		times(&end_time);
 

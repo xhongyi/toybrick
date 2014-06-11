@@ -1,8 +1,8 @@
 #!/usr/bin/python
 import os, re
 
-MAX_PREFETCH_HEAD_START = 5000
-STRIDE = 50
+MAX_PREFETCH_HEAD_START = 1000
+STRIDE = 10
 RUNS_PER_TEST = 3
 
 INPUT_READ_FILE = 'check0'
@@ -13,7 +13,7 @@ time_to_completion = [[[0,0,0,0] for j in range(RUNS_PER_TEST)  ] for i in range
 fout = open("safety.out", "w")
 
 for trial in range(RUNS_PER_TEST):
-    for prefetch_head_start in range(1, MAX_PREFETCH_HEAD_START, STRIDE):
+    for prefetch_head_start in range(0, MAX_PREFETCH_HEAD_START, STRIDE):
         # compute the current index
         curr_index = prefetch_head_start / STRIDE
 
@@ -25,8 +25,8 @@ for trial in range(RUNS_PER_TEST):
         
         # parse out the % of cache miss
         fin_data = fin.read().split("\n")
-        time_to_completion[curr_index][trial][2] = float(re.sub(",", "", fin_data[4].split(" ")[7]))
-        time_to_completion[curr_index][trial][3] = float(re.sub(",", "", fin_data[5].split(" ")[7]))
+        time_to_completion[curr_index][trial][2] = [int(s) for s in re.sub(",","",fin_data[4]).split() if s.isdigit()][0]
+        time_to_completion[curr_index][trial][3] = [int(s) for s in re.sub(",","",fin_data[5]).split() if s.isdigit()][0]
         time_to_completion[curr_index][trial][1] = round(100 * time_to_completion[curr_index][trial][3] / time_to_completion[curr_index][trial][2], 2)
 
         # parse out the time to run the bivector filtering

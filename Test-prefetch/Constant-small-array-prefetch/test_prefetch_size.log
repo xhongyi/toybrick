@@ -1,0 +1,11 @@
+close failed in file object destructor:
+sys.excepthook is missing
+lost sys.stderr
+
+ Performance counter stats for './start.py 3 0':
+
+        13,232,252 cache-references                                            
+         7,346,225 cache-misses              #   55.518 % of all cache refs    
+
+       1.059411640 seconds time elapsed
+
