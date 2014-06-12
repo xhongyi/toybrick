@@ -4,8 +4,8 @@ lost sys.stderr
 
  Performance counter stats for './start.py 3 0':
 
-        13,232,252 cache-references                                            
-         7,346,225 cache-misses              #   55.518 % of all cache refs    
+        76,124,379 cache-references                                            
+        37,500,960 cache-misses              #   49.263 % of all cache refs    
 
-       1.059411640 seconds time elapsed
+       2.975364597 seconds time elapsed
 
