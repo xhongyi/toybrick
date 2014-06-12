@@ -15,10 +15,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fstream>
 
 #include <emmintrin.h>
 
 #define BATCH_RUN 1000000 
+#define RANDOM_NUM_FILE "random_num.dat"
 
 using namespace std;
 
@@ -111,10 +113,14 @@ int main(int argc, char* argv[]) {
 		}
 		*/
 
+		ifstream randFile(RANDOM_NUM_FILE);
+		
+
 		times(&start_time);
 
 		for (int i = 0; i < read_size; i++) {
-		  read_idx = rand() % read_size;
+		  // read_idx = rand() % read_size;
+		  randFile >> read_idx;
 
 		  // perform bitvector computations on the 
 			strncpy(read_t, init_all_NULL, 128);

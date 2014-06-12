@@ -4,7 +4,7 @@ CXX = g++
 
 CC = g++
 
-CFLAGS = -O3 -msse4.2 -I .
+CFLAGS = -g -O3 -msse4.2 -I .
 #CFLAGS = -g -O0 -msse4.2 -I .
 
 UNAME_S := $(shell uname -s)

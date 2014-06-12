@@ -1,9 +1,9 @@
 #!/usr/bin/python
 import os, re
 
-MAX_PREFETCH_HEAD_START = 1000
-STRIDE = 10
-RUNS_PER_TEST = 3
+MAX_PREFETCH_HEAD_START = 50
+STRIDE = 1
+RUNS_PER_TEST = 4
 
 INPUT_READ_FILE = 'check0'
 OUTPUT_BENCHMARK_FILE = 'constant_prefetch.dat'

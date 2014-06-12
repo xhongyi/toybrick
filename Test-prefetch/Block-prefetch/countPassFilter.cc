@@ -16,8 +16,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <emmintrin.h>
+#include <fstream>
 
 #define BATCH_RUN 1000000 
+#define RANDOM_NUM_FILE "random_num.dat"
 
 using namespace std;
 
@@ -98,10 +100,14 @@ int main(int argc, char* argv[]) {
 		// create an array to store the random indices
 		int indices[PREFETCH_AMT];
 
+		ifstream randFile(RANDOM_NUM_FILE);
+
 		times(&start_time);
 		for (read_idx = 0; read_idx < read_size; read_idx+=PREFETCH_AMT) {
 		  for(int i = 0; i < PREFETCH_AMT; i++){
-		    indices[i] = rand() % read_size;
+		    //indices[i] = rand() % read_size;
+		    randFile >> indices[i];
+
 		    /*
 		     * prefetch the random strings in read_strs AND ref_strs
 		     */
