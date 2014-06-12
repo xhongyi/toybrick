@@ -74,7 +74,6 @@ int main(int argc, char* argv[]) {
 //		strncpy(ref, init_all_NULL, 128);
 		
 		for (read_size = 0; read_size < BATCH_RUN; read_size++) {
-			
 			//get read
 			getline(&tempstr, &lineLength, stdin);
 			length = strlen(tempstr);
