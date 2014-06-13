@@ -16,8 +16,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <emmintrin.h>
+#include <fstream>
 
 #define BATCH_RUN 1000000 
+#define RANDOM_NUM_FILE "random_num.dat"
 
 using namespace std;
 
@@ -102,13 +104,17 @@ int main(int argc, char* argv[]) {
     // create an array to store the random indices
     int indices[PREFETCH_AMT];
 
+    ifstream randFile(RANDOM_NUM_FILE);
+    
     for (read_idx = 0; read_idx < read_size; read_idx+=PREFETCH_AMT) {
 
       //int num = rand() % read_size;
       // fill the array
       for(int i = 0; i < PREFETCH_AMT; i++){
 
-		indices[i] = rand() % read_size;
+       	randFile >> indices[i];
+
+	//indices[i] = rand() % read_size;
 	//indices[i] = num;
       }
 
@@ -119,25 +125,53 @@ int main(int argc, char* argv[]) {
 		  
       times(&start_time);
       
-        for(int i = 0; i < PREFETCH_AMT; i++){
+      /*
+       * prefetch the first indices
+       */
+      for(int i = 0; i < PREFETCH_HEAD_START; i++){
 	_mm_prefetch(read_strs + indices[i], _MM_HINT_T0);
 	_mm_prefetch(read_strs[indices[i]].c_str() + 64, _MM_HINT_T0);
 		    
 	_mm_prefetch(ref_strs + indices[i], _MM_HINT_T0);
 	_mm_prefetch(ref_strs[indices[i]].c_str() + 64, _MM_HINT_T0);
-	}
+      }
 
       /*
-       * begin the real main loop
+       * begin the main loop
        */
-      
-      for(int i = 0; i < PREFETCH_AMT - PREFETCH_HEAD_START; i++){
+      int i;
+      for(i = 0; i < PREFETCH_AMT - PREFETCH_HEAD_START; i++){
 
 	_mm_prefetch(read_strs + indices[i + PREFETCH_HEAD_START], _MM_HINT_T0);
 	_mm_prefetch(read_strs[indices[i + PREFETCH_HEAD_START]].c_str() + 64, _MM_HINT_T0);
 		    
 	_mm_prefetch(ref_strs + indices[i +  PREFETCH_HEAD_START], _MM_HINT_T0);
 	_mm_prefetch(ref_strs[indices[i + PREFETCH_HEAD_START]].c_str() + 64, _MM_HINT_T0);
+
+	strncpy(read_t, init_all_NULL, 128);
+	strncpy(ref_t, init_all_NULL, 128);
+		    
+	length = read_strs[indices[i]].length();
+		    
+	if (length > 128)
+	  length = 128;
+	strncpy(read_t, read_strs[indices[i]].c_str(), length);
+		    
+	length = ref_strs[indices[i]].length();
+	//Get rid of the new line character
+	if (length > 128)
+	  length = 128;
+	strncpy(ref_t, ref_strs[indices[i]].c_str(), length);
+
+	if (bit_vec_filter_sse1(read_t, ref_t, length, error))
+	  valid_buff[indices[i]] = true;
+      }
+
+
+      /*
+       * finish computing the last few numbers
+       */
+      for(i; i < PREFETCH_AMT; i++){
 
 	strncpy(read_t, init_all_NULL, 128);
 	strncpy(ref_t, init_all_NULL, 128);

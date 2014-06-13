@@ -15,10 +15,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fstream>
 
 #include <emmintrin.h>
 
 #define BATCH_RUN 1000000 
+#define RANDOM_NUM_FILE "random_num.dat"
 
 using namespace std;
 
@@ -104,33 +106,40 @@ int main(int argc, char* argv[]) {
 		 * designed to simulate random access
 		 */
 		
+		/*
 		random_indices = new int[read_size];
 		for(int i = 0; i < read_size; i++){
 		  random_indices[i] = rand() % read_size; 
 		}
+		*/
+
+		ifstream randFile(RANDOM_NUM_FILE);
+		
 
 		times(&start_time);
 
 		for (int i = 0; i < read_size; i++) {
+		  // read_idx = rand() % read_size;
+		  randFile >> read_idx;
 
 		  // perform bitvector computations on the 
 			strncpy(read_t, init_all_NULL, 128);
 			strncpy(ref_t, init_all_NULL, 128);
 
-			length = read_strs[random_indices[i]].length();
+			length = read_strs[read_idx].length();
 
 			if (length > 128)
 				length = 128;
-			strncpy(read_t, read_strs[random_indices[i]].c_str(), length);
+			strncpy(read_t, read_strs[read_idx].c_str(), length);
 
-			length = ref_strs[random_indices[i]].length();
+			length = ref_strs[read_idx].length();
 			//Get rid of the new line character
 			if (length > 128)
 				length = 128;
-			strncpy(ref_t, ref_strs[random_indices[i]].c_str(), length);
+			strncpy(ref_t, ref_strs[read_idx].c_str(), length);
 
 			if (bit_vec_filter_sse1(read_t, ref_t, length, error))
-				valid_buff[random_indices[i]] = true;
+				valid_buff[read_idx] = true;
 		}
 
 		times(&end_time);
