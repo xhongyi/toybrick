@@ -1,8 +1,12 @@
-EXECUTABLE = countPassFilter popcount bit_convert vector_filter string_cp shift #ssse3_popcount test_modifier
+EXECUTABLE = countPassFilter popcount bit_convert vector_filter string_cp shift sse.o#ssse3_popcount test_modifier
 
 CXX = g++
 
 CC = g++
+
+LD = ld
+
+LDFLAGS = -r
 
 CFLAGS = -O3 -msse4.2 -I .
 UNAME_S := $(shell uname -s)
@@ -36,6 +40,9 @@ vector_filter.o: vector_filter.c vector_filter.h
 
 mask.o: mask.c mask.h
 	$(CC) $(CFLAGS) -c $< -o $@
+
+sse.o: mask.o print.o bit_convert.o popcount.o vector_filter.o
+	$(LD) $(LDFLAGS) $^ -o $@
 
 vector_filter: mask.o print.o bit_convert.o popcount.o vector_filter.o vector_filterMain.c
 	$(CC) $(CFLAGS) $^ -o $@
