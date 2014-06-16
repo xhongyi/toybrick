@@ -108,14 +108,11 @@ int main(int argc, char* argv[]) {
     
     for (read_idx = 0; read_idx < read_size; read_idx+=PREFETCH_AMT) {
 
-      //int num = rand() % read_size;
       // fill the array
       for(int i = 0; i < PREFETCH_AMT; i++){
 
        	randFile >> indices[i];
 
-	//indices[i] = rand() % read_size;
-	//indices[i] = num;
       }
 
       elp_time.tms_stime = 0;
@@ -129,7 +126,7 @@ int main(int argc, char* argv[]) {
        * prefetch the first indices
        */
       for(int i = 0; i < PREFETCH_HEAD_START; i++){
-	_mm_prefetch(read_strs + indices[i], _MM_HINT_T0);
+     	_mm_prefetch(read_strs + indices[i], _MM_HINT_T0);
 	_mm_prefetch(read_strs[indices[i]].c_str() + 64, _MM_HINT_T0);
 		    
 	_mm_prefetch(ref_strs + indices[i], _MM_HINT_T0);
@@ -166,7 +163,6 @@ int main(int argc, char* argv[]) {
 	if (bit_vec_filter_sse1(read_t, ref_t, length, error))
 	  valid_buff[indices[i]] = true;
       }
-
 
       /*
        * finish computing the last few numbers
