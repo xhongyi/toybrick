@@ -1,40 +1,47 @@
 #!/usr/bin/python
-import os, re
+import os, re, sys
 
-MAX_PREFETCH_HEAD_START = 50
+MAX_PREFETCH_HEAD_START = 1000
 STRIDE = 1
-RUNS_PER_TEST = 4
+RUNS_PER_TEST = 5
 
 INPUT_READ_FILE = 'check0'
 OUTPUT_BENCHMARK_FILE = 'constant_prefetch.dat'
 
-time_to_completion = [[[0,0,0,0] for j in range(RUNS_PER_TEST)  ] for i in range(0, MAX_PREFETCH_HEAD_START, STRIDE) ]
+time_to_completion = [[[0 for i in range(13)] for j in range(RUNS_PER_TEST)  ] for i in range(0, MAX_PREFETCH_HEAD_START, STRIDE) ]
 
 fout = open("safety.out", "w")
+fout.write("pref dis" + "\t" + "time(s)" + "\t" + "L1-dcache-loads" + "\t" + "L1-dcache-stores" + "\t" + "L1-dcache-load-stores" + "\t" + "L1-dcache-load-misses" + "\t" + "L1-dcache-store-misses" + "\t" + "LLC-loads" + "\t" + "LLC-stores" + "\t" + "LLC-load-stores" + "\t" + "LLC-load-misses" + "\t" + "LLC-store-misses" + "\t" + "LLC-prefetches" + "\t" + "LLC-prefetch-misses" + "\n")
 
 for trial in range(RUNS_PER_TEST):
     for prefetch_head_start in range(0, MAX_PREFETCH_HEAD_START, STRIDE):
         # compute the current index
         curr_index = prefetch_head_start / STRIDE
 
-        command_to_run = 'perf stat -B -e cache-references,cache-misses ./start.py 3 ' +  str(prefetch_head_start) + " 2> test_prefetch_size.log"
+        command_to_run = 'perf stat -e L1-dcache-loads:u -e L1-dcache-stores:u -e L1-dcache-load-stores:u -e L1-dcache-load-misses:u -e L1-dcache-store-misses:u -e LLC-loads:u -e LLC-stores:u -e LLC-load-stores:u -e LLC-load-misses:u -e LLC-store-misses:u -e LLC-prefetches:u -e LLC-prefetches-misses:u ./start.py 3 ' +  str(prefetch_head_start) + " 2> test_prefetch_size.log"
         print command_to_run
         
         out =  os.popen(command_to_run).read()
         fin = open("test_prefetch_size.log", "r")
-        
-        # parse out the % of cache miss
-        fin_data = fin.read().split("\n")
-        time_to_completion[curr_index][trial][2] = [int(s) for s in re.sub(",","",fin_data[4]).split() if s.isdigit()][0]
-        time_to_completion[curr_index][trial][3] = [int(s) for s in re.sub(",","",fin_data[5]).split() if s.isdigit()][0]
-        time_to_completion[curr_index][trial][1] = round(100 * time_to_completion[curr_index][trial][3] / time_to_completion[curr_index][trial][2], 2)
 
+        # parse out the cache information
+        fin_data = fin.read().split("\n")
+        for i in range(len(time_to_completion[curr_index][trial]) - 1):
+            time_to_completion[curr_index][trial][i + 1] = [int(s) for s in re.sub(",","",fin_data[4 + 2 * i]).split() if s.isdigit()][0]
+    
         # parse out the time to run the bivector filtering
         time_to_completion[curr_index][trial][0] = float(out.split("\n")[2].split(" ")[-1])
 
-        # print and write to file incase of error
-        print prefetch_head_start, time_to_completion[curr_index][trial][0], time_to_completion[curr_index][trial][1],time_to_completion[curr_index][trial][2],time_to_completion[curr_index][trial][3]
-        fout.write(str(prefetch_head_start) + "\t" + str(time_to_completion[curr_index][trial][0]) + "\t" + str(time_to_completion[curr_index][trial][1]) + "\t" + str(time_to_completion[curr_index][trial][2]) + "\t"  + str(time_to_completion[curr_index][trial][3]) + "\n")
+    # print and write to file incase of error
+        sys.stdout.write(str(prefetch_head_start) + "\t")
+        for i in range(len(time_to_completion[curr_index][trial]) - 1):
+            sys.stdout.write(str(time_to_completion[curr_index][trial][i]) + "\t")
+        sys.stdout.write(str(time_to_completion[curr_index][trial][len(time_to_completion[curr_index][trial]) - 1]) + "\n")
+
+        fout.write(str(prefetch_head_start) + "\t")
+        for i in range(len(time_to_completion[curr_index][trial]) - 1):
+            fout.write(str(time_to_completion[curr_index][trial][i]) + "\t")
+        fout.write(str(time_to_completion[curr_index][trial][len(time_to_completion[curr_index][trial]) - 1]) + "\n")
         fout.flush()
 
 
@@ -42,12 +49,16 @@ for trial in range(RUNS_PER_TEST):
 f = open(OUTPUT_BENCHMARK_FILE, "w")
 
 # write the file header
-f.write("pref-hs\ttime\t%-cmiss\tcref\tcmiss\n")
+f.write("pref dis" + "\t" + "time(s)" + "\t" + "L1-dcache-loads" + "\t" + "L1-dcache-stores" + "\t" + "L1-dcache-load-stores" + "\t" + "L1-dcache-load-misses" + "\t" + "L1-dcache-store-misses" + "\t" + "LLC-loads" + "\t" + "LLC-stores" + "\t" + "LLC-load-stores" + "\t" + "LLC-load-misses" + "\t" + "LLC-store-misses" + "\t" + "LLC-prefetches" + "\t" + "LLC-prefetch-misses" + "\n")
 
-for prefetch_head_start in range(1, MAX_PREFETCH_HEAD_START, STRIDE):
+for prefetch_head_start in range(0, MAX_PREFETCH_HEAD_START, STRIDE):
     for trial in range(RUNS_PER_TEST):
         curr_index = prefetch_head_start / STRIDE
-        f.write( str(prefetch_head_start) + "\t" + str(time_to_completion[curr_index][trial][0]) + "\t" + str(time_to_completion[curr_index][trial][1]) + "\t" + str(time_to_completion[curr_index][trial][2]) +"\t" + str(time_to_completion[curr_index][trial][3]) + "\n")
+
+        f.write(str(prefetch_head_start) + "\t")
+        for i in range(len(time_to_completion[curr_index][trial]) - 1):
+            f.write(str(time_to_completion[curr_index][trial][i]) + "\t")
+        f.write(str(time_to_completion[curr_index][trial][len(time_to_completion[curr_index][trial]) - 1]) + "\n")
 
 f.flush()
 f.close()
