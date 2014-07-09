@@ -18,7 +18,7 @@ DEFINE =
 CFLAGS = -O3 -funroll-loops -march=nocona -maccumulate-outgoing-args
 LIBS = -lm 
 
-all: Sa_lookup 2BWT-Builder 2BWT-Interface.o
+all: Lookup 2BWT-Builder 2BWT-Interface.o
 
 BWT.o:	BWT.c BWT.h TypeNLimit.h MemManager.h TextConverter.h HSP.h MiscUtilities.h DNACount.h r250.h HSPstatistic.h Makefile
 
@@ -62,10 +62,12 @@ Timing.o:	Timing.c Timing.h Makefile
 	$(CC) $(CFLAGS) 2BWT-Builder.o BWT.o BWTConstruct.o MiscUtilities.o MemManager.o TextConverter.o r250.o QSufSort.o iniparser.o inistrlib.o dictionary.o DNACount.o HSP.o HSPstatistic.o karlin.o Timing.o Socket.o -o 2bwt-builder -lm
 
 
-Sa_lookup.o:	Sa_lookup.c Makefile
+Lookup.o:	Lookup.c Makefile
 
-Sa_lookup:	Sa_lookup.o 2BWT-Interface.o BWT.o BWTConstruct.o MiscUtilities.o MemManager.o TextConverter.o r250.o QSufSort.o iniparser.o inistrlib.o dictionary.o DNACount.o Timing.o Socket.o HSP.o HSPstatistic.o karlin.o Makefile
-	$(CC) $(CFLAGS) Sa_lookup.o 2BWT-Interface.o  BWT.o BWTConstruct.o MiscUtilities.o MemManager.o TextConverter.o r250.o QSufSort.o iniparser.o inistrlib.o dictionary.o DNACount.o HSP.o HSPstatistic.o karlin.o Timing.o Socket.o -o Sa_lookup -lm
+Lookup:	Lookup.o 2BWT-Interface.o BWT.o BWTConstruct.o MiscUtilities.o MemManager.o TextConverter.o r250.o QSufSort.o iniparser.o inistrlib.o dictionary.o DNACount.o Timing.o Socket.o HSP.o HSPstatistic.o karlin.o Makefile
+	$(CC) $(CFLAGS) Lookup.o 2BWT-Interface.o  BWT.o BWTConstruct.o MiscUtilities.o MemManager.o TextConverter.o r250.o QSufSort.o iniparser.o inistrlib.o dictionary.o DNACount.o HSP.o HSPstatistic.o karlin.o Timing.o Socket.o -o Lookup -lm
 
 2BWT-Interface.o:	2BWT-Interface.c 2BWT-Interface.h Makefile
 
+clean:
+	$(RM) *.o *~
