@@ -1,0 +1,1 @@
+perf stat -e L1-dcache-loads:u -e L1-dcache-stores:u -e L1-dcache-load-stores:u -e L1-dcache-load-misses:u -e L1-dcache-store-misses:u -e LLC-loads:u -e LLC-stores:u -e LLC-load-stores:u -e LLC-load-misses:u -e LLC-store-misses:u -e LLC-prefetches:u -e LLC-prefetches-misses:u ./start.py 3 5
