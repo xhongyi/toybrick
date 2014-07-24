@@ -1,0 +1,105 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <nmmintrin.h>
+#include "RefGenome.h"
+
+#define TRUE 1
+#define FALSE 0
+#define MAX_FASTA_FILE_WIDTH 83 /* 80 bps, 2 for newline and carriage return, 1 for null terminator*/
+
+FILE *_reference_file;
+unsigned long long _num_bps = 0;
+unsigned long long *_genome_breaks;
+unsigned char *_reference;
+
+int _init_called = FALSE;
+
+/************************************/
+
+/**
+ * reads the reference genome database and store metadata used in load_reference
+ */
+void init_reference(char* ref_file_name){  
+
+  _reference_file = fopen(ref_file_name, "r");
+  if(_reference_file == NULL){
+    fprintf(stderr, "Error while opening %s", ref_file_name); perror(" ");
+    exit(EXIT_FAILURE);
+  }
+
+  /* Count the number of base pairs and number of genome breaks in reference  */
+  int i, num_genome_breaks;
+  char line[MAX_FASTA_FILE_WIDTH];
+  while(fgets(line, sizeof(line), line) != NULL){
+
+    switch(line[0]) {
+    case '>':
+      num_genome_breaks++;
+      break;
+    case ';':	
+      break; /* ';' is a comment line in fasta. Just skip it */
+    case 'A':
+    case 'C':
+    case 'G':
+    case 'T':
+    case 'N':
+      _num_bps += strlen(line)
+      break;
+    default :
+      fprintf(stderr, "Unknown character found in %s\n", ref_file_name);
+      exit(EXIT_FAILURE);
+    }
+
+    /* reset size line to zero length string */
+    line[0] = '\0';
+  }
+
+  /* exit loop and allocate memory */
+  _genome_breaks = malloc(num_genome_breaks * sizeof(unsigned long long));
+
+  /* 3 to ensure enough memory is added when _num_bps is not divisble by 4
+  _reference = malloc( ((_num_bps+3) / 4) * sizeof(unsigned char));
+  
+  
+
+
+  /* marked that init was called and the program can continue */
+  _init_called = TRUE;
+}
+
+/**
+ * creates the reference genome database and handles conversion to bit vectors
+ */
+void load_reference(){
+  // error handling
+  if(! _init_called){
+    fprintf(stderr, "\nerror: init_reference(char*) not called before load_reference(). See RefGenome.{h,c} for more details\n");
+    exit(EXIT_FAILURE);
+  }
+
+  
+
+}
+
+/**
+ *
+ */
+void get_seed(unsigned long long pos, int length, __m128i seed){
+
+  printf("hello world\n");
+
+}
+
+
+/**
+ * Free memory
+ */
+ void ref_mem_free(){
+   free(_reference);
+   free(_reference_file);
+   free(_genome_breaks);
+   
+ }
