@@ -12,6 +12,7 @@
 
 #define SSE_BITCONVERT_STRING_SIZE 128
 #define DEFAULT_FASTA_LINE_WIDTH 80
+#define BITS_PER_BYTE 8
 #define EXTRA_CHARS 3
 #define NULL_CHAR 1
 
@@ -93,13 +94,6 @@ void Reference::collect_metadata(char* ref_file_name){
   num_genome_breaks = genome_breaks.size();
   fclose(ref_file_ptr);
 
-  /* debugging code
-  for(int i = 0; i < num_genome_breaks; i++){
-    printf("%s\n", name_genome_breaks[i].c_str());
-  }
-  printf("%u\n", num_genome_breaks);
-  printf("%llu\n", num_base_pairs);
-  */
 }
 
 /**
@@ -107,6 +101,8 @@ void Reference::collect_metadata(char* ref_file_name){
  * in the reference
  *
  * Also, remove newline char at the end if it exists
+ *
+ * Returns the length of the reformatted string
  */
 int Reference::reformat_line(char* buffer){
   const int len = strlen(buffer);
@@ -120,7 +116,7 @@ int Reference::reformat_line(char* buffer){
     buffer[end] = '\0'; 
     return end;
   }
-  return len;
+  else{ return len; }
 }
 
 /**
@@ -163,9 +159,8 @@ void Reference::build(char* ref_file_name){
 
   /* Declare helper variables and buffers for bit conversion */
   int str_len, str_pos, buffer_pos = 0, ref_pos = 0;
-  char char_buffer[SSE_BITCONVERT_STRING_SIZE + NULL_CHAR] __aligned__ = "\0";
-  //static __aligned__ unsigned char bit0[SSE_BITCONVERT_STRING_SIZE / 8];
-  //static __aligned__ unsigned char bit1[SSE_BITCONVERT_STRING_SIZE / 8];
+  const int bits_per_sse_convert = SSE_BITCONVERT_STRING_SIZE / BITS_PER_BYTE;
+  char char_buffer[SSE_BITCONVERT_STRING_SIZE + NULL_CHAR] = "\0";
 
   /* loop through fasta file and convert basepairs to bits */
   char line[fasta_line_width];
@@ -187,28 +182,35 @@ void Reference::build(char* ref_file_name){
        */
       str_len = reformat_line(line);
       
+      /*
+       * If TRUE: The entire line will fit into the dedicated bit conversion
+       * buffer. Will read more lines until the buffer is filled (i.e has
+       * SSE_BITCONVERT_STRING_SIZE chars)
+       *
+       * If FALSE: The line will fill the dedicated buffer. All the chars that
+       * will fit into the buffer are copied, then the buffer is converted into
+       * bits and stored into the reference database. After converting, the
+       * chars that did not fit into the buffer are copied into the buffer to
+       * which is emptied in the process.
+       */
       if(buffer_pos + str_len < SSE_BITCONVERT_STRING_SIZE){
 	strncat(char_buffer, line, str_len);
 	buffer_pos += str_len;
       }
       else{
-	/* figure out how much of the current line needs to be copied */
+	/* figure out how much of the current line can fit into the buffer */
 	str_pos = SSE_BITCONVERT_STRING_SIZE - buffer_pos;
 	strncat(char_buffer, line, str_pos);
 
-	/* convert bits and copy to database */
+	/* convert the buffer to bits and copy to database */
+      	//printf("\n");
+	//printf("%s\n", char_buffer);
 	sse3_convert2bit1(char_buffer, reference.bits0 + ref_pos, reference.bits1 + ref_pos);
-	//sse3_convert2bit1(char_buffer, bit0, bit1);
-	printf("\n");
-	printf("%s\n", char_buffer);
-	//printbytevector(bit0, 16);
-	printbytevector(reference.bits0 + ref_pos, 16);
-	printf("\n");
-	//printbytevector(bit1, 16);
-	printbytevector(reference.bits1 + ref_pos, 16);
-	printf("\n");
-
-	ref_pos += 16;
+	//printbytevector(reference.bits0 + ref_pos, 16);
+	//printf("\n");
+	//printbytevector(reference.bits1 + ref_pos, 16);
+	//printf("\n");
+	ref_pos += bits_per_sse_convert;
 
 	/* copy the remainder of the line to the next buffer */
 	strncpy(char_buffer, line + str_pos, str_len - str_pos + 1); 
@@ -224,10 +226,11 @@ void Reference::build(char* ref_file_name){
    * Convert any remaining chars in the buffer to bits and put into db
    */
   printf("%s\n", char_buffer);
-  //bit convert and such    
-  
-
-
+  sse3_convert2bit1(char_buffer, reference.bits0 + ref_pos, reference.bits1 + ref_pos);
+  printbytevector(reference.bits0 + ref_pos, 16);                                                                                                           
+  printf("\n");                                                                                                                                             
+  printbytevector(reference.bits1 + ref_pos, 16);                                                                                                           
+  printf("\n");
 
   num_genome_breaks = genome_breaks.size();
   fclose(ref_file_ptr);
