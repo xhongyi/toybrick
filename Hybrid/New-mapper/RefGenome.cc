@@ -2,15 +2,20 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include <string.h>
 #include <list>
 
 #include "RefGenome.h"
 #include "bit_convert.h"
+#include "print.h"
 
+#define SSE_BITCONVERT_STRING_SIZE 128
 #define DEFAULT_FASTA_LINE_WIDTH 80
 #define EXTRA_CHARS 3
+#define NULL_CHAR 1
+
+#define __aligned__ __attribute__((aligned(16)))
 
 using namespace std;
 
@@ -39,8 +44,8 @@ Reference::Reference(unsigned int f_f_width) : fasta_line_width(f_f_width + EXTR
  * Destructor
  */
 Reference::~Reference(){ 
-  delete reference.bits0;
-  delete reference.bits1;
+  /*  delete reference.bits0;
+      delete reference.bits1;*/
 }
 
 
@@ -52,6 +57,7 @@ Reference::~Reference(){
  */
 void Reference::collect_metadata(char* ref_file_name){
 
+  /* open fasta file */
   FILE *ref_file_ptr;
   ref_file_ptr = fopen(ref_file_name,"r");
 
@@ -60,11 +66,13 @@ void Reference::collect_metadata(char* ref_file_name){
     exit(EXIT_FAILURE);
   }
 
+  /* loop through fasta file and collect metadata */
   char line[fasta_line_width];
   while(fgets(line, sizeof(line), ref_file_ptr)){
 
     switch(line[0]){
     case '>':
+      name_genome_breaks.push_back(string(line));
       genome_breaks.push_back(num_base_pairs);
       break;
     case ';':
@@ -82,14 +90,38 @@ void Reference::collect_metadata(char* ref_file_name){
     }
 
   }  
-
   num_genome_breaks = genome_breaks.size();
-
   fclose(ref_file_ptr);
-  delete ref_file_ptr;
 
+  /* debugging code
+  for(int i = 0; i < num_genome_breaks; i++){
+    printf("%s\n", name_genome_breaks[i].c_str());
+  }
+  printf("%u\n", num_genome_breaks);
+  printf("%llu\n", num_base_pairs);
+  */
 }
 
+/**
+ * Replaces 'N' by 'A' in char array. Used to remove unknown base pairs  
+ * in the reference
+ *
+ * Also, remove newline char at the end if it exists
+ */
+int Reference::reformat_line(char* buffer){
+  const int len = strlen(buffer);
+  for(int i = 0; i < len; i++){
+    if(buffer[i] == 'N'){ buffer[i] = 'A'; }
+  }
+
+  /* remove newline at end of line if it exists */
+  const int end = len - 1;
+  if(buffer[end] == '\n') { 
+    buffer[end] = '\0'; 
+    return end;
+  }
+  return len;
+}
 
 /**
  * Takes in fasta reference file name and builds the reference database
@@ -115,11 +147,91 @@ void Reference::build(char* ref_file_name){
    *
    * so 8 bps fit into a single 8 bit byte. We first add 7 then 
    * divide by 8 to ensure enough memory is allocated.
-   */  
+    */  
   unsigned long long bytes2allocate = (num_base_pairs + 7) / 8;
   reference.bits0 = (unsigned char*) malloc(bytes2allocate * sizeof(unsigned char));
   reference.bits1 = (unsigned char*) malloc(bytes2allocate * sizeof(unsigned char));
+
+  /* open fasta file */
+  FILE *ref_file_ptr;
+  ref_file_ptr = fopen(ref_file_name,"r");
+
+  if(ref_file_ptr == NULL){
+    perror("Error while opening the file");
+    exit(EXIT_FAILURE);
+  }
+
+  /* Declare helper variables and buffers for bit conversion */
+  int str_len, str_pos, buffer_pos = 0, ref_pos = 0;
+  char char_buffer[SSE_BITCONVERT_STRING_SIZE + NULL_CHAR] __aligned__ = "\0";
+  //static __aligned__ unsigned char bit0[SSE_BITCONVERT_STRING_SIZE / 8];
+  //static __aligned__ unsigned char bit1[SSE_BITCONVERT_STRING_SIZE / 8];
+
+  /* loop through fasta file and convert basepairs to bits */
+  char line[fasta_line_width];
+  while(fgets(line, sizeof(line), ref_file_ptr)){
+
+    switch(line[0]){
+    case '>':
+    case ';':
+      break; /* skip non-base pair lines */
+    case 'A':
+    case 'C':
+    case 'G':
+    case 'T':
+    case 'N': 
+      /* 
+       * replaces 'N' base pair (unknowns) with A's 
+       * remove newline at end if present
+       * returns length of char*
+       */
+      str_len = reformat_line(line);
+      
+      if(buffer_pos + str_len < SSE_BITCONVERT_STRING_SIZE){
+	strncat(char_buffer, line, str_len);
+	buffer_pos += str_len;
+      }
+      else{
+	/* figure out how much of the current line needs to be copied */
+	str_pos = SSE_BITCONVERT_STRING_SIZE - buffer_pos;
+	strncat(char_buffer, line, str_pos);
+
+	/* convert bits and copy to database */
+	sse3_convert2bit1(char_buffer, reference.bits0 + ref_pos, reference.bits1 + ref_pos);
+	//sse3_convert2bit1(char_buffer, bit0, bit1);
+	printf("\n");
+	printf("%s\n", char_buffer);
+	//printbytevector(bit0, 16);
+	printbytevector(reference.bits0 + ref_pos, 16);
+	printf("\n");
+	//printbytevector(bit1, 16);
+	printbytevector(reference.bits1 + ref_pos, 16);
+	printf("\n");
+
+	ref_pos += 16;
+
+	/* copy the remainder of the line to the next buffer */
+	strncpy(char_buffer, line + str_pos, str_len - str_pos + 1); 
+	buffer_pos = str_len - str_pos;
+      }
+      break;
+    default:
+      fprintf(stderr, "Unknown character found in %s\n", ref_file_name);
+      exit(EXIT_FAILURE);
+    }    
+  }
+  /*
+   * Convert any remaining chars in the buffer to bits and put into db
+   */
+  printf("%s\n", char_buffer);
+  //bit convert and such    
   
+
+
+
+  num_genome_breaks = genome_breaks.size();
+  fclose(ref_file_ptr);
+ 
 }
 
 /**

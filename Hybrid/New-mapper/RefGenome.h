@@ -35,6 +35,16 @@ class Reference{
    */
   void collect_metadata(char*);
   
+  /**
+   * Replaces 'N' by 'A' in char array. Used to remove unknown base pairs
+   * in the reference
+   *
+   * Also, remove the newline character at the end of the line if it exists
+   *
+   * Returns the length of the string
+   */ 
+  int reformat_line(char*);
+
  public:
   Reference();
   Reference(unsigned int);
