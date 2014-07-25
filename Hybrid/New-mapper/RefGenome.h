@@ -20,13 +20,21 @@ class Reference{
   RefDB reference;
 
   unsigned int num_genome_breaks;
-  std::vector<std::string> name_genome_breaks;
   std::vector<unsigned long long> genome_breaks;
-  
+  std::vector<std::string> name_genome_breaks;
+
   unsigned long long num_base_pairs;
 
+  std::string fasta_file_name;
   const unsigned int fasta_line_width;
+
+  bool previously_loaded_or_built;
   
+  /**
+   *
+   */
+  void check_if_already_loaded_or_built();
+
   /**
    * Used in the public "build" function. Takes in a fasta file name
    *
@@ -39,7 +47,7 @@ class Reference{
    * Replaces 'N' by 'A' in char array. Used to remove unknown base pairs
    * in the reference
    *
-   * Also, remove the newline character at the end of the line if it exists
+   * Also, removes the newline character at the end of the line if it exists
    *
    * Returns the length of the string
    */ 
