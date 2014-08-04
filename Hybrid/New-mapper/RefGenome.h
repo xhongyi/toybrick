@@ -76,7 +76,7 @@ class Reference{
   /**
    * Takes in the global position of the 
    */
-  void query(unsigned long long, char**);
+  void query(unsigned long long, unsigned long long, unsigned char**);
 
 };
 

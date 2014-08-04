@@ -15,6 +15,9 @@
 #include "bit_convert.h"
 #include "print.h"
 
+/*
+ * Define constants
+ */
 #define SSE_BITCONVERT_STRING_SIZE 128
 #define DEFAULT_FASTA_LINE_WIDTH 80
 #define BITS_PER_BYTE 8
@@ -65,7 +68,8 @@ void Reference::check_if_already_loaded_or_built(){
   
   /* ensures the build or load function are only called once per reference object */
   if(previously_loaded_or_built){
-    fprintf(stderr, "Error: a reference object may only be built or loaded once per instance. Check to make sure you only made one call to either 'load' or 'build'.\n");
+    fprintf(stderr, "Error: a reference object may only be built or loaded once per \
+ instance. Check to make sure you only made one call to either 'load' or 'build'.\n");
     exit(EXIT_FAILURE);
   }
   else{
@@ -269,12 +273,14 @@ void Reference::build(char* ref_file_name){
   fclose(ref_file_ptr);
 
   //print out the contents of the database raw
+  /*
   for(int i = 0; i < num_base_pairs / 8 ; i += 16){
     printbytevector(reference.bits0 + i, 16);
     printf("\n");
     printbytevector(reference.bits1 + i, 16);  
     printf("\n");
   }
+  */
 
 }
 
@@ -350,18 +356,18 @@ void Reference::load(char* refdb_file_name){
   /* read number of base pairs in db file */
   if( !fgets(line, sizeof(line), refmeta_file_ptr) ) { 
     fprintf(stderr,"Error readng metadata file\n"); exit(EXIT_FAILURE); }
-  num_base_pairs = atol(line);
+  num_base_pairs = atol(line);//SHOULD BE CHANGED TO CONVERT TO UNSIGNED LONG LONG
 
   /* read number of genome division in db */
   if( !fgets(line, sizeof(line), refmeta_file_ptr) ) { 
     fprintf(stderr,"Error readng metadata file\n"); exit(EXIT_FAILURE); }
-  num_genome_breaks = atoi(line);
+  num_genome_breaks = atoi(line);//SHOULD BE CHANGED TO CONVERT TO UNSIGNED INT
 
   for(unsigned int i = 0; i < num_genome_breaks; i++){
     /* read the position of the genome division */
     if( !fgets(line, sizeof(line), refmeta_file_ptr) ) { 
       fprintf(stderr,"Error readng metadata file\n"); exit(EXIT_FAILURE); }
-    genome_breaks.push_back(atol(line));
+    genome_breaks.push_back(atol(line));//SHOULD BE CHANGED TO CONVERT TO UNSIGNED LONG LONG
 
     /* read the name of the genome */
     if( !fgets(line, sizeof(line), refmeta_file_ptr) ) { 
@@ -390,6 +396,8 @@ void Reference::load(char* refdb_file_name){
    * bits0 = 0 1 0 0 0 0 1 1 0
    * bits1 = 0 1 1 1 0 0 0 1 0
    *
+   * NOTE: because of 
+   *
    * so 8 bps fit into a single 8 bit byte. We first add 7 then 
    * divide by 8 to ensure enough memory is allocated.
    */  
@@ -407,28 +415,75 @@ void Reference::load(char* refdb_file_name){
   }
   
   /* read the first bits into the database */
-  fread(reference.bits0, sizeof(*reference.bits0), bytes2allocate, refdb_file_ptr);
+  if( !fread(reference.bits0, sizeof(*reference.bits0), bytes2allocate, refdb_file_ptr) ){
+    fprintf(stderr,"Error reading reference database (bits 0)\n"); exit(EXIT_FAILURE); }
 
   /* read the second bits into the database */
-  fread(reference.bits1, sizeof(*reference.bits0), bytes2allocate, refdb_file_ptr); 
+  if( !fread(reference.bits1, sizeof(*reference.bits0), bytes2allocate, refdb_file_ptr) ){
+    fprintf(stderr,"Error reading reference database (bits 1)\n"); exit(EXIT_FAILURE); }
 
+  /*
   printf("\n\n\n");
-
   for(int i = 0; i < num_base_pairs / 8 ; i += 16){
     printbytevector(reference.bits0 + i, 16);
     printf("\n");
     printbytevector(reference.bits1 + i, 16);  
     printf("\n");
-  }
-
+    }*/
 
 }
 
 /**
+ * Takes in the global position of a seed and the seend length. Then returns the two pointers to bit vectors corrsponding to that seed. 
  *
+ * THE USER IS RESPONSIBLE FOR FREEING MEMORY CREATED BY THIS FUNCTION
  */
-void Reference::query(unsigned long long pos, char** seed){
+void Reference::query(unsigned long long pos, unsigned long long length, unsigned char** seed){
 
-  printf("hello world\n");
+  /* The byte where the seed begins in the reference bitvector */
+  const unsigned long long ref_pos = pos / BITS_PER_BYTE;
 
+  /* The bit within the start byte where the seed begins */
+  const unsigned int ref_shift = pos % BITS_PER_BYTE;
+
+  /* Bytes to alloacte for the output arrays */
+  const unsigned long long bytes2allocate = (length + (BITS_PER_BYTE - 1)) / BITS_PER_BYTE;
+  
+  /* Declare a temporary array to store the pointers to the bit vectors */
+  unsigned char* tmp_seed[2];
+  
+  /* allocates memory using C++ "new". The user of the function must deallocate memory with "delete" */
+  tmp_seed[0] = new unsigned char[bytes2allocate]; //(char*) malloc(bytes2allocate * sizeof(unsigned char));
+  tmp_seed[1] = new unsigned char[bytes2allocate]; //(char*) malloc(bytes2allocate * sizeof(unsigned char));
+
+  /* store the bits into the reference byte-by-byte */
+  unsigned char small_buff0, small_buff1;
+  for(int i = 0; i < bytes2allocate; i++){
+  
+    small_buff0 = reference.bits0[ref_pos + i];
+    small_buff1 = reference.bits1[ref_pos + i];
+    
+    small_buff0 >>= ref_shift;
+    small_buff1 >>= ref_shift;
+    
+    small_buff0 |= reference.bits0[ref_pos + i + 1] << (BITS_PER_BYTE - ref_shift);
+    small_buff1 |= reference.bits1[ref_pos + i + 1] << (BITS_PER_BYTE - ref_shift);
+    
+    tmp_seed[0][i] = small_buff0;
+    tmp_seed[1][i] = small_buff1;
+  }
+
+  /* Make any trailing but not included in the seed zeros */
+  tmp_seed[0][bytes2allocate - 1] &= 0xff >> BITS_PER_BYTE - length % BITS_PER_BYTE;
+  tmp_seed[1][bytes2allocate - 1] &= 0xff >> BITS_PER_BYTE - length % BITS_PER_BYTE;
+  
+
+  printbytevector(tmp_seed[0], bytes2allocate);
+  cout << endl;  
+  printbytevector(tmp_seed[1], bytes2allocate); 
+  cout << endl;
+
+  /* Copy the bit vectors to the output */
+  seed[0] = tmp_seed[0];
+  seed[1] = tmp_seed[1];
 }
