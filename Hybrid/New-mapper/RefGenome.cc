@@ -1,7 +1,10 @@
 
 /*
- * Written by : John Emmons
- * Contact : emmons.john@gmail.com
+ * Genome Reference
+ * Used to build, store, load, and access a bit-vector DNA database
+ *
+ * Created by : John Emmons
+ * Updated on : Aug 4, 2014
  */
 
 #include <iostream>
@@ -15,27 +18,32 @@
 #include "bit_convert.h"
 #include "print.h"
 
-/*
- * Define constants
- */
+/* Define constants */
+#define SUCCESS 0
+#define FAILURE -1
+#define BITS_PER_BYTE 8
+
+/* Fasta file parameters */
 #define SSE_BITCONVERT_STRING_SIZE 128
 #define DEFAULT_FASTA_LINE_WIDTH 80
-#define BITS_PER_BYTE 8
-#define EXTRA_CHARS 3 /* the space a newline, carriage return, and null char take up */
-#define NULL_CHAR 1 /* space the null char takes up */
 
+/* Metadata file parameters */
 #define DB_FILE_EXTENSION ".db"
 #define META_FILE_EXTENSION ".meta"
-
 #define META_FILE_WIDTH 1024
+
+/* c-string and character constants */
+#define NULL_CHAR 1 /* space the null char takes up */
+/* the space a newline, carriage return, and null char take up */
+#define EXTRA_CHARS 3
 
 using namespace std;
 
 /**
- * Default Constructor: assumes no more than 80 basepairs per line in
- * fasta file (i.e. set fasta_line_width = 80)
+ * Default Constructor: assumes no more than 80 basepairs per line in fasta file
+ * (i.e. set fasta_line_width = 80)
  *
- * Also initializes class variables
+ * Also initializes class variables important to the internal state
  */
 Reference::Reference() : fasta_line_width(DEFAULT_FASTA_LINE_WIDTH){ 
   num_base_pairs = 0;
@@ -44,32 +52,36 @@ Reference::Reference() : fasta_line_width(DEFAULT_FASTA_LINE_WIDTH){
 }
 
 /**
- * Constructor: OVERRIDES THE DEFAULT FASTA LINE WIDTH OF 80 CHARACTERS!
- * Sets the constant file width which is the number of basepairs per line
- * in the fasta file plus 3 more for newline, carriage return, and null
+ * Constructor: OVERRIDES THE DEFAULT FASTA LINE WIDTH OF 80 CHARACTERS! Sets
+ * the constant file width which is the number of basepairs per line in the
+ * fasta file plus 3 more for newline, carriage return, and null
  *
- * Also initializes class variables
+ * Also initializes class variables important to the internal state
  */
-Reference::Reference(unsigned int f_f_width) : fasta_line_width(f_f_width + EXTRA_CHARS) {  
+Reference::Reference(unsigned int f_f_width) : fasta_line_width(f_f_width + \
+                                                                EXTRA_CHARS) {  
   num_base_pairs = 0;
   num_genome_breaks = 0;
   previously_loaded_or_built = false;
 }
 
 /**
- * Destructor
+ * Destructor: frees up the memory allocated to reference database
  */
 Reference::~Reference(){ 
   free(reference.bits0);
   free(reference.bits1);
 }
 
+/**
+ * Ensures the build or load function are only called once per reference object
+ */ 
 void Reference::check_if_already_loaded_or_built(){
-  
-  /* ensures the build or load function are only called once per reference object */
+
   if(previously_loaded_or_built){
-    fprintf(stderr, "Error: a reference object may only be built or loaded once per \
- instance. Check to make sure you only made one call to either 'load' or 'build'.\n");
+    fprintf(stderr, "Error: a reference object may only be built or loaded once\
+             per instance. Check to make sure you only made one call to either \
+             'load' or 'build'.\n");
     exit(EXIT_FAILURE);
   }
   else{
@@ -84,7 +96,7 @@ void Reference::check_if_already_loaded_or_built(){
  * Sets num_genome_breaks, num_base_pairs, and allocates and sets
  * the genome_breaks vector
  */
-void Reference::collect_metadata(char* ref_file_name){
+bool Reference::collect_metadata(char* ref_file_name){
   
   /* save the filename */
   fasta_file_name = string(ref_file_name);
@@ -95,7 +107,7 @@ void Reference::collect_metadata(char* ref_file_name){
 
   if(ref_file_ptr == NULL){
     perror("Error while opening the file");
-    exit(EXIT_FAILURE);
+    return FAILURE;
   }
 
   /* loop through fasta file and collect metadata */
@@ -118,25 +130,30 @@ void Reference::collect_metadata(char* ref_file_name){
       break;
     default:
       fprintf(stderr, "Unknown character found in %s\n", ref_file_name);
-      exit(EXIT_FAILURE);
+      return FAILURE;
     }
 
   }  
   num_genome_breaks = genome_breaks.size();
   fclose(ref_file_ptr);
 
+  /* code has processed the file properly if it makes it here*/
+  return SUCCESS;
+
 }
 
 /**
- * Replaces 'N' by 'A' in char array. Used to remove unknown base pairs  
- * in the reference
+ * Replaces 'N' by 'A' in char array. Used to remove unknown base pairs in the
+ * reference
  *
  * Also, remove newline char at the end if it exists
  *
  * Returns the length of the reformatted string
  */
 int Reference::reformat_line(char* buffer){
-  const int len = strlen(buffer);
+  const static int len = strlen(buffer);
+
+  /* replace all N by A in buffer */
   for(int i = 0; i < len; i++){
     if(buffer[i] == 'N'){ buffer[i] = 'A'; }
   }
@@ -153,7 +170,7 @@ int Reference::reformat_line(char* buffer){
 /**
  * Takes in fasta reference file name and builds the reference database
  */ 
-void Reference::build(char* ref_file_name){
+bool Reference::build(char* ref_file_name){
 
   /* ensures the build function is only called once per reference object */
   check_if_already_loaded_or_built();
@@ -175,12 +192,23 @@ void Reference::build(char* ref_file_name){
    * bits0 = 0 1 0 0 0 0 1 1 0
    * bits1 = 0 1 1 1 0 0 0 1 0
    *
-   * so 8 bps fit into a single 8 bit byte. We first add 7 then 
+   * note that this code was designed for little-endian systems
+   * so the base pairs will be in reverse order on a byte granuality
+   * That is, the base pairs are enumerated like
+   *
+   * bits = 7 6 5 4 3 2 1 0 | 15 14 13 12 11 10 9 8 | 23 22 ... 
+   */
+
+  /*
+   * As a result, 8 bps fit into a single 8 bit byte. We first add 7 then 
    * divide by 8 to ensure enough memory is allocated.
    */  
-  const unsigned long long bytes2allocate = (num_base_pairs + (BITS_PER_BYTE - 1)) / BITS_PER_BYTE;
-  reference.bits0 = (unsigned char*) malloc(bytes2allocate * sizeof(unsigned char));
-  reference.bits1 = (unsigned char*) malloc(bytes2allocate * sizeof(unsigned char));
+  const unsigned long long bytes2allocate = (num_base_pairs + \
+                           (BITS_PER_BYTE - 1)) / BITS_PER_BYTE;
+  reference.bits0 = (unsigned char*) malloc(bytes2allocate * \
+                                            sizeof(unsigned char));
+  reference.bits1 = (unsigned char*) malloc(bytes2allocate * \
+                                            sizeof(unsigned char));
 
   /* open fasta file */
   FILE *ref_file_ptr;
@@ -188,7 +216,7 @@ void Reference::build(char* ref_file_name){
 
   if(ref_file_ptr == NULL){
     perror("Error while opening the file");
-    exit(EXIT_FAILURE);
+    return FAILURE;
   }
 
   /* Declare helper variables and buffers for bit conversion */
@@ -238,7 +266,8 @@ void Reference::build(char* ref_file_name){
 	strncat(char_buffer, line, str_pos);
 
 	/* convert the buffer to bits and store in database */
-	sse3_convert2bit1(char_buffer, reference.bits0 + ref_pos, reference.bits1 + ref_pos);
+	sse3_convert2bit1(char_buffer, reference.bits0 + ref_pos, reference.bits1 + \
+                                                            ref_pos);
 	ref_pos += bits_per_sse_convert;
 
 	/* empty the buffer and copy the remainder of the line into the buffer */
@@ -248,7 +277,7 @@ void Reference::build(char* ref_file_name){
       break;
     default:
       fprintf(stderr, "Unknown character found in %s\n", ref_file_name);
-      exit(EXIT_FAILURE);
+      return FAILURE;
     }    
   }
   /*
@@ -260,7 +289,8 @@ void Reference::build(char* ref_file_name){
    */
   unsigned char tmp_bits0[bits_per_sse_convert];
   unsigned char tmp_bits1[bits_per_sse_convert];  
-  const int num_char_to_print = (buffer_pos + (BITS_PER_BYTE - 1)) / BITS_PER_BYTE;
+  const int num_char_to_print = (buffer_pos + \
+                                (BITS_PER_BYTE - 1)) / BITS_PER_BYTE;
 
   sse3_convert2bit1(char_buffer, tmp_bits0, tmp_bits1);
 
@@ -281,23 +311,25 @@ void Reference::build(char* ref_file_name){
     printf("\n");
   }
   */
-
+  
+  return SUCCESS;
 }
+
 
 /**
  * writes the contents of the reference database to a file <ref_file_name>.db
  * and stores metadata in a separate file <refdb_file_name>.db.meta
- * 
  */
-void Reference::store(){
+bool Reference::store(){
   
   /* open and store metadata file */
   FILE *refmeta_file_ptr;
-  refmeta_file_ptr = fopen((fasta_file_name + DB_FILE_EXTENSION + META_FILE_EXTENSION).c_str(),"w");
+  refmeta_file_ptr = fopen((fasta_file_name + DB_FILE_EXTENSION + \
+                            META_FILE_EXTENSION).c_str(),"w");
 
   if(refmeta_file_ptr == NULL){
     perror("Error while opening the file");
-    exit(EXIT_FAILURE);
+    return FAILURE;
   }
 
   /* print metadata */
@@ -317,7 +349,7 @@ void Reference::store(){
 
   if(refdb_file_ptr == NULL){
     perror("Error while opening the file");
-    exit(EXIT_FAILURE);
+    return FAILURE;
   }
   
   /* figure out how many byte must be written */
@@ -336,18 +368,19 @@ void Reference::store(){
 /**
  *
  */
-void Reference::load(char* refdb_file_name){
+bool Reference::load(char* refdb_file_name){
 
   /* ensures the load function is only called once per reference object */
   check_if_already_loaded_or_built();
 
   /* open and read metadata file */
   FILE *refmeta_file_ptr;
-  refmeta_file_ptr = fopen((string(refdb_file_name) + META_FILE_EXTENSION).c_str(), "r");
+  refmeta_file_ptr = fopen((string(refdb_file_name) + \
+                                   META_FILE_EXTENSION).c_str(), "r");
   
   if(refmeta_file_ptr == NULL){
     perror("Error while opening the file");
-    exit(EXIT_FAILURE);
+    return FAILURE;
   }
 
   /* read the metadata file and collect metadata */
@@ -355,55 +388,43 @@ void Reference::load(char* refdb_file_name){
 
   /* read number of base pairs in db file */
   if( !fgets(line, sizeof(line), refmeta_file_ptr) ) { 
-    fprintf(stderr,"Error readng metadata file\n"); exit(EXIT_FAILURE); }
-  num_base_pairs = atol(line);//SHOULD BE CHANGED TO CONVERT TO UNSIGNED LONG LONG
+    fprintf(stderr,"Error readng metadata file\n"); return FAILURE; }
+  num_base_pairs = strtoull(line, NULL, 10);
 
   /* read number of genome division in db */
   if( !fgets(line, sizeof(line), refmeta_file_ptr) ) { 
-    fprintf(stderr,"Error readng metadata file\n"); exit(EXIT_FAILURE); }
-  num_genome_breaks = atoi(line);//SHOULD BE CHANGED TO CONVERT TO UNSIGNED INT
+    fprintf(stderr,"Error readng metadata file\n"); return FAILURE; }
+  num_genome_breaks = strtoull(line, NULL, 10);
 
   for(unsigned int i = 0; i < num_genome_breaks; i++){
     /* read the position of the genome division */
     if( !fgets(line, sizeof(line), refmeta_file_ptr) ) { 
-      fprintf(stderr,"Error readng metadata file\n"); exit(EXIT_FAILURE); }
-    genome_breaks.push_back(atol(line));//SHOULD BE CHANGED TO CONVERT TO UNSIGNED LONG LONG
+      fprintf(stderr,"Error readng metadata file\n"); return FAILURE; }
+    genome_breaks.push_back(strtoull(line, NULL, 10));
 
     /* read the name of the genome */
     if( !fgets(line, sizeof(line), refmeta_file_ptr) ) { 
-      fprintf(stderr,"Error readng metadata file\n"); exit(EXIT_FAILURE); }
+      fprintf(stderr,"Error readng metadata file\n"); return FAILURE; }
     name_genome_breaks.push_back(string(line));
     
   }
 
   fclose(refmeta_file_ptr);
 
-  /*
-    printf("%u %u %u %s", num_base_pairs, num_genome_breaks, genome_breaks[0], name_genome_breaks[0].c_str());
-   */
- 
   /* 
    * allocate memory for genome database 
    *
-   * base pairs (bp) are stored in 2 bits each (00, 01, 10, 11)
-   * the bits for bps are split into two arrays (bits0, bits1)
+   * see the build functions allocate memory section for more detail.
    *
-   * For example, ATCCAAGTA = 00,11,01,01,00,00,10,11,00 but the
-   * bits for each are split into two array
-   *         A T C C A A G T A
-   *         | | | | | | | | |
-   *         V V V V V V V V V 
-   * bits0 = 0 1 0 0 0 0 1 1 0
-   * bits1 = 0 1 1 1 0 0 0 1 0
-   *
-   * NOTE: because of 
-   *
-   * so 8 bps fit into a single 8 bit byte. We first add 7 then 
-   * divide by 8 to ensure enough memory is allocated.
+   * In the end, 8 bps fit into a single 8 bit byte. We first add 7 
+   * then divide by 8 to ensure enough memory is allocated.
    */  
-  const unsigned long long bytes2allocate = (num_base_pairs + (BITS_PER_BYTE - 1)) / BITS_PER_BYTE;
-  reference.bits0 = (unsigned char*) malloc(bytes2allocate * sizeof(unsigned char));
-  reference.bits1 = (unsigned char*) malloc(bytes2allocate * sizeof(unsigned char));
+  const unsigned long long bytes2allocate = (num_base_pairs + \
+                           (BITS_PER_BYTE - 1)) / BITS_PER_BYTE;
+  reference.bits0 = (unsigned char*) malloc(bytes2allocate *  \
+                                            sizeof(unsigned char));
+  reference.bits1 = (unsigned char*) malloc(bytes2allocate *  
+                                            sizeof(unsigned char));
 
   /* open and read in binary reference database */
   FILE *refdb_file_ptr;
@@ -411,16 +432,22 @@ void Reference::load(char* refdb_file_name){
   
   if(refdb_file_ptr == NULL){
     perror("Error while opening the file");
-    exit(EXIT_FAILURE);
+    return FAILURE;
   }
   
   /* read the first bits into the database */
-  if( !fread(reference.bits0, sizeof(*reference.bits0), bytes2allocate, refdb_file_ptr) ){
-    fprintf(stderr,"Error reading reference database (bits 0)\n"); exit(EXIT_FAILURE); }
+  if( !fread(reference.bits0, sizeof(*reference.bits0), bytes2allocate, \
+      refdb_file_ptr) ){
+    fprintf(stderr,"Error reading reference database (bits 0)\n"); 
+    return FAILURE; 
+    }
 
   /* read the second bits into the database */
-  if( !fread(reference.bits1, sizeof(*reference.bits0), bytes2allocate, refdb_file_ptr) ){
-    fprintf(stderr,"Error reading reference database (bits 1)\n"); exit(EXIT_FAILURE); }
+  if( !fread(reference.bits1, sizeof(*reference.bits0), bytes2allocate, \
+      refdb_file_ptr) ){
+    fprintf(stderr,"Error reading reference database (bits 0)\n"); 
+    return FAILURE;
+   }
 
   /*
   printf("\n\n\n");
@@ -431,14 +458,16 @@ void Reference::load(char* refdb_file_name){
     printf("\n");
     }*/
 
+  return SUCCESS;
 }
 
 /**
- * Takes in the global position of a seed and the seend length. Then returns the two pointers to bit vectors corrsponding to that seed. 
+ * Takes in the global position of a seed and the seed length. Then returns 
+ * the two pointers to bit vectors corrsponding to that seed. 
  *
  * THE USER IS RESPONSIBLE FOR FREEING MEMORY CREATED BY THIS FUNCTION
  */
-void Reference::query(unsigned long long pos, unsigned long long length, unsigned char** seed){
+bool Reference::query(unsigned long long pos, unsigned long long length, unsigned char** seed){
 
   /* The byte where the seed begins in the reference bitvector */
   const unsigned long long ref_pos = pos / BITS_PER_BYTE;
@@ -447,14 +476,18 @@ void Reference::query(unsigned long long pos, unsigned long long length, unsigne
   const unsigned int ref_shift = pos % BITS_PER_BYTE;
 
   /* Bytes to alloacte for the output arrays */
-  const unsigned long long bytes2allocate = (length + (BITS_PER_BYTE - 1)) / BITS_PER_BYTE;
+  const unsigned long long bytes2allocate = (length + \
+                           (BITS_PER_BYTE - 1)) / BITS_PER_BYTE;
   
   /* Declare a temporary array to store the pointers to the bit vectors */
   unsigned char* tmp_seed[2];
   
-  /* allocates memory using C++ "new". The user of the function must deallocate memory with "delete" */
-  tmp_seed[0] = new unsigned char[bytes2allocate]; //(char*) malloc(bytes2allocate * sizeof(unsigned char));
-  tmp_seed[1] = new unsigned char[bytes2allocate]; //(char*) malloc(bytes2allocate * sizeof(unsigned char));
+  /*
+  * Allocates memory using C++ "new". 
+  * The user of the function must deallocate memory with "delete"
+  */
+  tmp_seed[0] = new unsigned char[bytes2allocate];
+  tmp_seed[1] = new unsigned char[bytes2allocate];
 
   /* store the bits into the reference byte-by-byte */
   unsigned char small_buff0, small_buff1;
@@ -466,24 +499,30 @@ void Reference::query(unsigned long long pos, unsigned long long length, unsigne
     small_buff0 >>= ref_shift;
     small_buff1 >>= ref_shift;
     
-    small_buff0 |= reference.bits0[ref_pos + i + 1] << (BITS_PER_BYTE - ref_shift);
-    small_buff1 |= reference.bits1[ref_pos + i + 1] << (BITS_PER_BYTE - ref_shift);
+    small_buff0 |= reference.bits0[ref_pos + i + 1] << \
+                   (BITS_PER_BYTE - ref_shift);
+    small_buff1 |= reference.bits1[ref_pos + i + 1] << \
+                   (BITS_PER_BYTE - ref_shift);
     
     tmp_seed[0][i] = small_buff0;
     tmp_seed[1][i] = small_buff1;
   }
 
   /* Make any trailing but not included in the seed zeros */
-  tmp_seed[0][bytes2allocate - 1] &= 0xff >> BITS_PER_BYTE - length % BITS_PER_BYTE;
-  tmp_seed[1][bytes2allocate - 1] &= 0xff >> BITS_PER_BYTE - length % BITS_PER_BYTE;
-  
-
+  tmp_seed[0][bytes2allocate - 1] &= 0xff >> BITS_PER_BYTE - \
+                                             length % BITS_PER_BYTE;
+  tmp_seed[1][bytes2allocate - 1] &= 0xff >> BITS_PER_BYTE - \
+                                             length % BITS_PER_BYTE;
+  /* 
   printbytevector(tmp_seed[0], bytes2allocate);
   cout << endl;  
   printbytevector(tmp_seed[1], bytes2allocate); 
   cout << endl;
+  */
 
   /* Copy the bit vectors to the output */
   seed[0] = tmp_seed[0];
   seed[1] = tmp_seed[1];
+
+  return SUCCESS;
 }

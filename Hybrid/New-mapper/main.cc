@@ -9,6 +9,9 @@
 
 #include "RefGenome.h" 
 
+using namespace std;
+
+/*
 int is_big_endian(void)
 {
   union {
@@ -18,6 +21,7 @@ int is_big_endian(void)
 
   return e.c[0];
 }
+*/
 
 int main(int argc, char* argv[]){ 
 
@@ -33,13 +37,15 @@ int main(int argc, char* argv[]){
   my_ref.store();
 
   Reference my_other_ref;
-  my_other_ref.load(my_genome_db);
+  if(my_other_ref.load(my_genome_db)){
+    cout << "There was an error!" << endl;
+  }
 
   unsigned char* seed[2];
   my_ref.query(5, 10, seed);
  
-  printf("System is %s-endian.\n",
-	 is_big_endian() ? "big" : "little");
+  //  printf("System is %s-endian.\n",
+  //	 is_big_endian() ? "big" : "little");
 
  
   return 0;
