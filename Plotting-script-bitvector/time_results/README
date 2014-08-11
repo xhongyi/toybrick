@@ -1,0 +1,67 @@
+*******************************
+*   PLOT MAKING CODE README   *
+*******************************
+
+-----------
+Description of files
+-----------
+
+* bar_plot-data.py
+	Used to get information like the mean and %-speedup from data
+
+* bar_plot.gp
+	Gnuplot plotting file to make a simple bar plot
+
+* bar_plot-plot.py
+	Matplotlib plotting file used to make more complex plot
+
+* bar_plot.py
+	The plotting code called by the makefile. Make sure to cp or mv one of the other python plot files (bar_plot-data.py or bar_plot-plot.py) to this before trying to make
+
+* bar_plot.tex
+	Helper code to make latex plots with gnuplot
+
+* compile_data.sh
+	1 (of 2) data parsing scripts (the other is parse_data.py) used to combine data from multiple files into a wasily plottable format
+
+* Makefile
+	The file used the command make to compile documents. Be sure to cp or mv the correct Makefile (Makefile-gnuplot or Makefile-py) before running.
+
+* Makefile-gnuplot
+	The Makefile that is configured to create plots using gnuplot
+
+* Makefile-py
+	The Makefile configured to create plots using Matplotlib and python plotting scripts
+
+* parse_data.py
+	1 (of 2) data parsing scripts (the other is compile_data.sh) used to combine data from multiple files into a wasily plottable format
+
+-----------
+How to use
+-----------
+
+1) make sure that the following software are installed
+   - LaTex
+   - python + numpy + matplotlib
+   - gnuplot (optional: only for plotting with gnuplot)
+
+2) there are a few different Makefiles and bar_plot files. 
+   - To plot using matplotlib
+
+     >$ mv bar_plot-plot.py bar_plot.py
+     >$ make # to compile the document
+
+   - To plot using gnuplot rename Makefile-gnuplot to Makefile
+
+     >$ mv Makefile-gnuplot Makefile
+     >$ make
+     
+   - To get information like the mean and %-speedup 
+
+     >$ mv bar_plot-data.py bar_plot.py
+     >$ make 
+
+----------
+NOTE
+----------
+The code in thise directory is designed ONLY to plot the data in this directory. It is not designed to be multipurpose; nevertheless, it is relatively easy to configure

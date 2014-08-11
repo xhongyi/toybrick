@@ -1,0 +1,37 @@
+*******************************
+*   PLOT MAKING CODE README   *
+*******************************
+
+-----------
+Description of files
+-----------
+
+* bar_plot.py
+	The plotting code called by the makefile. Uses Matplotlib to create bar graph
+
+* compile_data.sh
+	1 (of 2) data parsing scripts (the other is parse_data.py) used to combine data from multiple files into a wasily plottable format
+
+* Makefile
+	The file used the command make to compile documents. Be sure to cp or mv the correct Makefile (Makefile-gnuplot or Makefile-py) before running.
+
+* parse_data.py
+	1 (of 2) data parsing scripts (the other is compile_data.sh) used to combine data from multiple files into a wasily plottable format
+
+-----------
+How to use
+-----------
+
+1) make sure that the following software are installed
+   - LaTex
+   - python + numpy + matplotlib
+
+2) to compile, simply run make
+
+     >$ make # to compile the document
+
+
+----------
+NOTE
+----------
+The code in thise directory is designed ONLY to plot the data in this directory. It is not designed to be multipurpose; nevertheless, it is relatively easy to configure
