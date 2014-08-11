@@ -591,10 +591,7 @@ int bit_vec_filter_no_flipping_sse1(char* read, char* ref, int length, int max_e
 }
 
 int bit_vec_filter_sse11(char* read, char* ref, int length, int max_error) {
-	//Get ready the bits
-//	memcpy(read_t, read, length * sizeof(char));
-//	memcpy(ref_t, ref, length * sizeof(char));
-
+	//Get the bits
 	sse3_convert2bit11(read, length, read_bit_t);
 	sse3_convert2bit11(ref, length, ref_bit_t);
 

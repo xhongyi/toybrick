@@ -8,8 +8,8 @@ import prefetch_run as pf
 """
 Define the runtime constants
 """
-MAX_PREFETCH_HEAD_START = 5000
-STRIDE = 10
+MAX_PREFETCH_HEAD_START = 1000
+STRIDE = 1
 RUNS_PER_TEST = 1
 
 INPUT_READ_FILE = 'check0'

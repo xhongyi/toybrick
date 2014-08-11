@@ -17,6 +17,7 @@
 #include <string.h>
 #include <emmintrin.h>
 #include <fstream>
+#include <iostream>
 
 #define BATCH_RUN 1000000 
 #define RANDOM_NUM_FILE_1 "random_num.inp"
@@ -110,6 +111,12 @@ int main(int argc, char* argv[]) {
     ifstream randFile_1(RANDOM_NUM_FILE_1);
     ifstream randFile_2(RANDOM_NUM_FILE_2);
 
+    if( !randFile_1.is_open() || !randFile_2.is_open()){
+      cout << "failed to open the random number file\n";
+      cout << "check: " << RANDOM_NUM_FILE_1 << " and " 
+	   << RANDOM_NUM_FILE_2 << endl;
+    }
+
     // throw away the first few elements in the prefetch random num file
     int garbage;
     for(int i = 0; i < PREFETCH_HEAD_START; i++){
@@ -140,10 +147,14 @@ int main(int argc, char* argv[]) {
 		  
       times(&start_time);
       
+
+
       /*
        * begin the main loop
        */
       int i;
+
+      times(&start_time);
       for(i = 0; i < BLOCK_SIZE; i++){
 
 	if(filled){
@@ -152,7 +163,6 @@ int main(int argc, char* argv[]) {
 		    
 	  _mm_prefetch(ref_strs + prefetch_indices[i], _MM_HINT_T0);
 	  _mm_prefetch(ref_strs[prefetch_indices[i]].c_str() + 64, _MM_HINT_T0);
-
 	}
 
 	strncpy(read_t, init_all_NULL, 128);
@@ -170,7 +180,7 @@ int main(int argc, char* argv[]) {
 	  length = 128;
 	strncpy(ref_t, ref_strs[compute_indices[i]].c_str(), length);
 
-	if (bit_vec_filter_sse1(read_t, ref_t, length, error))
+	if (bit_vec_filter_sse1(read_t, ref_t, length, error))// this is where bit vector convert occurs
 	  valid_buff[compute_indices[i]] = true;
       }
 
@@ -184,6 +194,8 @@ int main(int argc, char* argv[]) {
 
       time_elapsed += (double) elp_time.tms_utime / sysconf(_SC_CLK_TCK);
     }
+
+
 
     for (read_idx = 0; read_idx < read_size; read_idx++) {
 
