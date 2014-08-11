@@ -12,7 +12,7 @@ fig1:
 	dvips srs_helper.dvi
 	ps2pdf srs_helper.ps
 	mv srs_helper.pdf varySrs.pdf
-	cp varySrs.pdf ../../SHD/sections/figures/
+#	cp varySrs.pdf ../../SHD/sections/figures/
 	echo "done with fig 1"
 
 fig2:
@@ -21,5 +21,5 @@ fig2:
 	dvips edit_helper.dvi
 	ps2pdf edit_helper.ps
 	mv edit_helper.pdf varyEdits.pdf
-	cp varyEdits.pdf ../../SHD/sections/figures/
+#	cp varyEdits.pdf ../../SHD/sections/figures/
 	echo "done with fig 2"
