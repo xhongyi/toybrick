@@ -5,7 +5,7 @@ Prefetch Benchmarking
 
 To make the binaries and prepare for testing just run:
 
-   ./make_and_copy.sh
+    ./make_and_copy.sh
 
 This is will compile the necessary files and copy the binaries to **this** directory for testing.
 
@@ -13,7 +13,7 @@ To configure the testing, you will have to edit the prefetch_benchmark.py file. 
 
 To run the test:
 
-   ./prefetch_benchmark.py
+    ./prefetch_benchmark.py
 
 Expects the input file to be called 'check0' to be a simple list of reads separated by newlines. You can always edit the variable INPUT_READ_FILE to change the input file name.
 
