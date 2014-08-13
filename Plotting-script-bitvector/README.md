@@ -19,7 +19,7 @@ Once make is run, the plots in 'time_results' and 'new_results2' will be copied 
 
     cd Plots
     make
-    ./bw.sh # Will convert the plot to grayscale
+    ./bw.sh # Will convert the plot to grayscale (only in time_result)
 
  
-The output plots for 'time_results' and 'new_results2' will be call **__final.pdf__**. For the plots in 'fp_result', the plots will be call **__varyEdits.pdf__** and **__varySRS.pdf__** respectively.
+The output plots for 'time_results' and 'new_results2' will be call **final.pdf**. For the plots in 'fp_result', the plots will be call **varyEdits.pdf** and **varySRS.pdf** respectively.
