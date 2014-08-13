@@ -1,19 +1,21 @@
-end_of_file
+close failed in file object destructor:
+sys.excepthook is missing
+lost sys.stderr
 
- Performance counter stats for './start.py 3 999':
+ Performance counter stats for './start.py 3 0':
 
-    14,157,931,020 L1-dcache-loads                                              [25.08%]
-     8,268,659,691 L1-dcache-stores                                             [33.41%]
-    14,172,865,002 L1-dcache-load-stores                                        [33.40%]
-       243,480,762 L1-dcache-load-misses     #    1.72% of all L1-dcache hits   [33.39%]
-        37,464,679 L1-dcache-store-misses                                       [33.34%]
-       171,829,672 LLC-loads                                                    [33.45%]
-         6,974,992 LLC-stores                                                   [33.44%]
-       170,184,517 LLC-load-stores                                              [33.42%]
-        89,695,164 LLC-load-misses           #   52.45% of all LL-cache hits    [16.68%]
-         4,676,675 LLC-store-misses                                             [16.73%]
-        45,885,261 LLC-prefetches                                               [16.72%]
-        42,386,194 LLC-prefetches-misses                                        [16.71%]
+     3,486,532,936 L1-dcache-loads                                              [24.46%]
+     2,056,440,872 L1-dcache-stores                                             [32.62%]
+     3,465,641,640 L1-dcache-load-stores                                        [33.75%]
+        42,853,358 L1-dcache-load-misses     #    1.23% of all L1-dcache hits   [34.48%]
+         8,132,064 L1-dcache-store-misses                                       [33.29%]
+        28,567,844 LLC-loads                                                    [34.19%]
+         1,951,022 LLC-stores                                                   [32.61%]
+        28,897,086 LLC-load-stores                                              [33.41%]
+        19,595,072 LLC-load-misses           #   68.20% of all LL-cache hits    [17.20%]
+         1,593,303 LLC-store-misses                                             [17.06%]
+         9,102,536 LLC-prefetches                                               [17.00%]
+         7,048,909 LLC-prefetches-misses                                        [15.93%]
 
-       9.320117708 seconds time elapsed
+       6.503671975 seconds time elapsed
 
