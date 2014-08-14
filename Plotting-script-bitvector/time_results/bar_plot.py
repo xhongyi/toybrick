@@ -196,9 +196,9 @@ ax.set_position([box.x0, box.y0, box.width * 0.775, box.height])
 ax1.set_position([box.x0, box.y0 - 0.5, box.width * 0.775, box.height])
 
 if(int(NUM_EDITS) == 1):
-    legend = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0]), ('SHD', 'Seqan', 'AF', 'Swps'), loc='upper left', title="$e="+str(NUM_EDITS)+"$", bbox_to_anchor=(1, 1.13))
+    legend = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0]), ('SHD', 'SeqAn', 'AF', 'Swps'), loc='upper left', title="$e="+str(NUM_EDITS)+"$", bbox_to_anchor=(1, 1.13))
 else:
-    legend = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0]), ('SHD', 'Seqan', 'AF', 'Swps'), loc='upper left', title="$e="+str(NUM_EDITS) + "$", bbox_to_anchor=(1, 1.13))
+    legend = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0]), ('SHD', 'SeqAn', 'AF', 'Swps'), loc='upper left', title="$e="+str(NUM_EDITS) + "$", bbox_to_anchor=(1, 1.13))
 plt.setp(legend.get_title(),fontsize='12')
 
 
