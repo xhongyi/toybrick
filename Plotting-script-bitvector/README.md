@@ -11,7 +11,7 @@ Plotting-script-bitvec
 - new_results2
 - fp_result
 
-all contain plotting code for creating plots used in the SHD paper. In all directories, you can compile the figures by simples running,
+All contain plotting code for creating plots used in the SHD paper. In all directories, you can compile the figures by simples running,
 
     make
 

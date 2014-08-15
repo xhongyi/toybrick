@@ -1,0 +1,29 @@
+#!/usr/bin/python
+import os
+
+choice = None
+
+while(choice != '1' and choice != '2' and choice != '3'):
+	choice = raw_input("""
+Plotting configuration
+----------------------
+	(1) Chunky (non-overlapping seed)
+	(2) Continuous (seed start at every bp) [This is the most useful]
+	(3) exit without changes
+What type of plot do you want to create: """)
+
+if(choice == '1'):
+	os.system("cp Chunk-plots/hotspot_finder-CHUNK.py hotspot_finder.py")
+	os.system("cp Chunk-plots/seed_freq-CHUNK.gp seed_freq.gp")
+
+	os.system("cp Bin/Chunk-plots/read_hotspots-CHUNK.cc Bin/read_hotspots.cc")
+	os.system("cd Bin/ && make")
+	  
+elif(choice == '2'):
+	os.system("cp Continuous-plots/hotspot_finder-CON.py hotspot_finder.py")
+	os.system("cp Continuous-plots/seed_freq-CON.gp seed_freq.gp")
+	
+	os.system("cp Bin/Continuous-plots/read_hotspots-CON.cc Bin/read_hotspots.cc")
+	os.system("cd Bin/ && make")
+else:
+	print("no changes made")
