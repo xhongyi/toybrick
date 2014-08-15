@@ -3,7 +3,7 @@ Seed Frequency and Optimal Seed Finding Code
 
 **Author:** John Emmons
 
-**Date:** August 15, 2014x
+**Date:** August 15, 2014
 
 **Description:** This was primarily used to create the "heat map" plots used during the summer of 2014. This directory include the code necessary to sample a genome for the number of locations a K-mer occurs and the plotting code to make the heat map. Look under setup and usage for basic instructions on how to use this code. Contact John Emmons @ emmons.john@gmail.com with questions.
 
