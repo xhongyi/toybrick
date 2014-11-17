@@ -4,7 +4,7 @@
  *  Created on: Nov 7, 2013
  *      Author: hxin
  */
-#include "popcount.h"
+#include "SRS.h"
 #include <stdio.h>
 #include <nmmintrin.h>
 #include "mask.h"
@@ -13,25 +13,25 @@
 #include <assert.h>
 #endif
 
-//uint8_t POPCOUNT_4bit[16] __aligned__ = {
-///* 0 */0,
-///* 1 */1,
-///* 2 */1,
-///* 3 */2,
-///* 4 */1,
-///* 5 */2,
-///* 6 */2,
-///* 7 */3,
-///* 8 */1,
-///* 9 */2,
-///* a */2,
-///* b */3,
-///* c */2,
-///* d */3,
-///* e */3,
-///* f */4 };
+uint8_t HAMMING_TABLE[16] __aligned__ = {
+/* 0 */0,
+/* 1 */1,
+/* 2 */1,
+/* 3 */2,
+/* 4 */1,
+/* 5 */2,
+/* 6 */2,
+/* 7 */3,
+/* 8 */1,
+/* 9 */2,
+/* a */2,
+/* b */3,
+/* c */2,
+/* d */3,
+/* e */3,
+/* f */4 };
 
-uint8_t POPCOUNT_4bit[16] __aligned__ = {
+uint8_t SRS_TABLE[16] __aligned__ = {
 /* 0 */0,
 /* 1 */1,
 /* 2 */1,
@@ -49,25 +49,7 @@ uint8_t POPCOUNT_4bit[16] __aligned__ = {
 /* e */1,
 /* f */1 };
 
-uint8_t POPCOUNT_4bit11[16] __aligned__ = {
-/* 0 */0,
-/* 1 */1,
-/* 2 */1,
-/* 3 */1,
-/* 4 */1,
-/* 5 */2,
-/* 6 */2,
-/* 7 */2,
-/* 8 */1,
-/* 9 */2,
-/* a */2,
-/* b */2,
-/* c */1,
-/* d */2,
-/* e */2,
-/* f */2 };
-
-uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
+uint32_t SRS_core(uint8_t* buffer, int chunks16, uint8_t *map) {
 	
 	uint32_t result;
 
@@ -138,7 +120,7 @@ uint32_t ssse3_popcount_core(uint8_t* buffer, int chunks16, uint8_t *map) {
 	return result;
 }
 
-uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
+uint32_t SRS_m128_core(__m128i reg, uint8_t *map) {
 
 	uint32_t result;
 
@@ -179,20 +161,16 @@ uint32_t ssse3_popcount_m128_core(__m128i reg, uint8_t *map) {
 	return result;
 }
 
-uint32_t popcount1_m128i_sse(__m128i reg) {
-	return ssse3_popcount_m128_core(reg, POPCOUNT_4bit);
+uint32_t hamming_m128i_sse(__m128i reg) {
+	return SRS_m128_core(reg, HAMMING_TABLE);
 }
 
-uint32_t popcount11_m128i_sse(__m128i reg) {
-	return ssse3_popcount_m128_core(reg, POPCOUNT_4bit11);
+uint32_t SRS_m128i_sse(__m128i reg) {
+	return SRS_m128_core(reg, SRS_TABLE);
 }
 
-uint32_t popcount1_sse(uint8_t* buffer, int chunks16) {
-	return ssse3_popcount_core(buffer, chunks16, POPCOUNT_4bit);
-}
-
-uint32_t popcount11_sse(uint8_t* buffer, int chunks16) {
-	return ssse3_popcount_core(buffer, chunks16, POPCOUNT_4bit11);
+uint32_t SRS_sse(uint8_t* buffer, int chunks16) {
+	return SRS_core(buffer, chunks16, SRS_TABLE);
 }
 
 uint32_t builtin_popcount(uint8_t* buffer, int chunks16) {
@@ -209,7 +187,7 @@ uint32_t builtin_popcount(uint8_t* buffer, int chunks16) {
 	return result;
 }
 
-uint32_t popcount1(uint8_t *buffer, int chunks16) {
+uint32_t SRS(uint8_t *buffer, int chunks16) {
 	uint32_t result = 0;
 
 	int i;
@@ -226,20 +204,3 @@ uint32_t popcount1(uint8_t *buffer, int chunks16) {
 	return result;
 }
 
-uint32_t popcount11(uint8_t *buffer, int chunks16) {
-	uint32_t result = 0;
-
-	int i;
-	for (i = 0; i < chunks16 * 16; i++) {
-		int j;
-		uint8_t mask = 3;
-		for (j = 0; j < 4; j++) {
-			printf("%x ", mask);
-			if (buffer[i] & mask)
-				result++;
-			mask = mask << 2;
-		}
-	}
-
-	return result;
-}
